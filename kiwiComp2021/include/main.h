@@ -77,6 +77,9 @@ void opcontrol(void);
  */
  #include "device_setup.hpp"
  #include "device_management.hpp"
+ #include "pid.hpp"
+ #include "drivetrain.hpp"
+ #include "auton.hpp"
 //#include <iostream>
 #endif
 

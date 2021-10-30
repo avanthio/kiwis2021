@@ -9,6 +9,7 @@ void setBrakeTypes(){
  intakeMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
  hookMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
  liftMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
+ stickMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 }
 
 void resetDevices(){
@@ -19,6 +20,7 @@ void resetDevices(){
   rightFrontMotor.tarePosition();
   hookMotor.tarePosition();
   liftMotor.tarePosition();
-  goalLiftLeftPneum.set_value(false);
-  goalLiftRightPneum.set_value(false);
+  stickMotor.tarePosition();
+  //goalLiftPneum.set_value(false);
+  stickPneum.set_value(true);
 }

@@ -9,11 +9,11 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	//set the brake type of all the motos
+	//set the brake type of all the motors
 	setBrakeTypes();
 	pros::delay(20);
-	//reset all the motors and pneumatics
-	//set encoders to zero and pneumatics to off/false
+
+	//reset all the motors and pneumatics (set encoders to zero and pneumatics to correct start setting)
 	resetDevices();
 }
 
@@ -46,7 +46,9 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	goalGrabAuton();
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -71,24 +73,47 @@ void opcontrol() {
 	int leftBackSpeed;
 	int rightFrontSpeed;
 	int rightBackSpeed;
-	bool goalLiftBool = 0;
-	bool stickPneumBool = 0;
+	//bool goalLiftBool = 0;
+	bool stickBool = 1;
+	bool driveDirectBool = 0;
 
 
 	while (true) {
-		axis3 = master.getAnalog(okapi::ControllerAnalog::leftY)*200;
-		axis2 = master.getAnalog(okapi::ControllerAnalog::rightY)*200;
 
-		leftFrontSpeed = axis3;
-		leftBackSpeed = axis3;
-		rightFrontSpeed = axis2;
-		rightBackSpeed = axis2;
+		if(driveReverseBtn.changedToPressed()){
+			driveDirectBool = !driveDirectBool;
+		}
+
+		if(driveDirectBool == 1){
+			axis3 = master.getAnalog(okapi::ControllerAnalog::leftY)*200;
+			axis2 = master.getAnalog(okapi::ControllerAnalog::rightY)*200;
+
+			leftFrontSpeed = axis3;
+			leftBackSpeed = axis3;
+			rightFrontSpeed = axis2;
+			rightBackSpeed = axis2;
 
 
-		leftFrontMotor.moveVelocity(leftFrontSpeed);
-		leftBackMotor.moveVelocity(leftBackSpeed);
-		rightFrontMotor.moveVelocity(rightFrontSpeed);
-		rightBackMotor.moveVelocity(rightBackSpeed);
+			leftFrontMotor.moveVelocity(leftFrontSpeed);
+			leftBackMotor.moveVelocity(leftBackSpeed);
+			rightFrontMotor.moveVelocity(rightFrontSpeed);
+			rightBackMotor.moveVelocity(rightBackSpeed);
+		}
+		else{
+			axis3 = master.getAnalog(okapi::ControllerAnalog::leftY)*200;
+			axis2 = master.getAnalog(okapi::ControllerAnalog::rightY)*200;
+
+			leftFrontSpeed = axis2;
+			leftBackSpeed = axis2;
+			rightFrontSpeed = axis3;
+			rightBackSpeed = axis3;
+
+
+			leftFrontMotor.moveVelocity(-leftFrontSpeed);
+			leftBackMotor.moveVelocity(-leftBackSpeed);
+			rightFrontMotor.moveVelocity(-rightFrontSpeed);
+			rightBackMotor.moveVelocity(-rightBackSpeed);
+		}
 
 		if(intakeInBtn.isPressed()){
 			intakeMotor.moveVelocity(200);
@@ -98,20 +123,23 @@ void opcontrol() {
 		}
 
 
-		if(hookOnBtn.changedToPressed()){
-			hookMotor.moveRelative(90,200);
+		if(hookOnBtn.isPressed()){
+			hookMotor.moveVelocity(100);
 		}
-		else if(hookOffBtn.changedToPressed()){
-			hookMotor.moveRelative(-90,200);
+		else if(hookOffBtn.isPressed()){
+			hookMotor.moveVelocity(-50);
+		}
+		else{
+			hookMotor.moveVelocity(0);
 		}
 
 
 		if(liftUpBtn.isPressed()){
-			liftMotor.moveVelocity(100);
+			liftMotor.moveVelocity(80);
 		}
 		else if(liftDownBtn.isPressed()){
 			if(limitSwitch.get_value()==false){
-				liftMotor.moveVelocity(-100);
+				liftMotor.moveVelocity(-80);
 			}
 			else{
 				liftMotor.moveVelocity(0);
@@ -123,14 +151,22 @@ void opcontrol() {
 		}
 
 		
-
-
-		if(goalLiftPneumBtn.changedToPressed()){
-			goalLiftBool = !goalLiftBool; 
+		if(stickUpBtn.isPressed()){
+			stickMotor.moveVelocity(25);
 		}
-		
-		goalLiftLeftPneum.set_value(goalLiftBool);
-		goalLiftRightPneum.set_value(goalLiftBool);
+		else if (stickDownBtn.isPressed()) {
+			stickMotor.moveVelocity(-25);
+		}
+		else{
+			stickMotor.moveVelocity(0);
+		}
+
+		if(stickPneumBtn.changedToPressed()){
+			stickBool = !stickBool;
+		}
+
+		stickPneum.set_value(stickBool);
+	
 
 		pros::delay(20);
 	}

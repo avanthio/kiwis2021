@@ -1,6 +1,4 @@
 #include "main.h"
-#include "device_management.hpp"
-#include "device_setup.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -8,13 +6,20 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+int chosenAuton = 3; //1 = goal grab, 2 = bonus line, 
+//3 = wp and neutral right, 4 = wp and neutral left
 void initialize() {
 	//set the brake type of all the motors
 	setBrakeTypes();
 	pros::delay(20);
 
-	//reset all the motors and pneumatics (set encoders to zero and pneumatics to correct start setting)
+	//reset all the motors and pneumatics 
+	//(set encoders to zero and pneumatics to correct start setting)
 	resetDevices();
+
+	//confirm that initialization is done
+	pros::lcd::print(1,"done");
+
 }
 
 /**
@@ -33,7 +38,10 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+
+void competition_initialize() {
+	
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -47,13 +55,27 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	goalGrabAuton();
+	//because I'm lazy and just want to change a number at the top of the file 
+	//instead of digging around for it
+	if(chosenAuton == 1){
+		goalGrabAuton();
+	}
+	else if(chosenAuton == 2){
+		bonusLineAuton();
+	}
+	else if(chosenAuton == 3){
+		wpAndGoalRight();
+	}
+	else if(chosenAuton ==4){
+		wpAndGoalLeft();
+	}
+
 }
 
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the operator
+  he Field Management System or the VEX Competition Switch in the operator
  * control mode.
  *
  * If no competition control is connected, this function will run immediately
@@ -73,48 +95,32 @@ void opcontrol() {
 	int leftBackSpeed;
 	int rightFrontSpeed;
 	int rightBackSpeed;
-	//bool goalLiftBool = 0;
-	bool stickBool = 1;
+	bool goalLiftBool = 0;
 	bool driveDirectBool = 0;
 
 
 	while (true) {
 
-		if(driveReverseBtn.changedToPressed()){
-			driveDirectBool = !driveDirectBool;
-		}
 
-		if(driveDirectBool == 1){
-			axis3 = master.getAnalog(okapi::ControllerAnalog::leftY)*200;
-			axis2 = master.getAnalog(okapi::ControllerAnalog::rightY)*200;
+		//we used to have a reversible drive 
+		//(press a button to drive in the opposite direction)
+		//but now we don't and I didn't feel like simplifying this code
+		
+		axis2 = master.getAnalog(okapi::ControllerAnalog::leftY)*200;
+		axis3 = master.getAnalog(okapi::ControllerAnalog::rightY)*200;
 
-			leftFrontSpeed = axis3;
-			leftBackSpeed = axis3;
-			rightFrontSpeed = axis2;
-			rightBackSpeed = axis2;
-
-
-			leftFrontMotor.moveVelocity(leftFrontSpeed);
-			leftBackMotor.moveVelocity(leftBackSpeed);
-			rightFrontMotor.moveVelocity(rightFrontSpeed);
-			rightBackMotor.moveVelocity(rightBackSpeed);
-		}
-		else{
-			axis3 = master.getAnalog(okapi::ControllerAnalog::leftY)*200;
-			axis2 = master.getAnalog(okapi::ControllerAnalog::rightY)*200;
-
-			leftFrontSpeed = axis2;
-			leftBackSpeed = axis2;
-			rightFrontSpeed = axis3;
-			rightBackSpeed = axis3;
+		leftFrontSpeed = axis2;
+		leftBackSpeed = axis2;
+		rightFrontSpeed = axis3;
+		rightBackSpeed = axis3;
 
 
-			leftFrontMotor.moveVelocity(-leftFrontSpeed);
-			leftBackMotor.moveVelocity(-leftBackSpeed);
-			rightFrontMotor.moveVelocity(-rightFrontSpeed);
-			rightBackMotor.moveVelocity(-rightBackSpeed);
-		}
-
+		leftFrontMotor.moveVelocity(leftFrontSpeed);
+		leftBackMotor.moveVelocity(leftBackSpeed);
+		rightFrontMotor.moveVelocity(rightFrontSpeed);
+		rightBackMotor.moveVelocity(rightBackSpeed);
+		
+		//no, we don't have an intake, but yes, this is still here :)
 		if(intakeInBtn.isPressed()){
 			intakeMotor.moveVelocity(200);
 		}
@@ -135,15 +141,17 @@ void opcontrol() {
 
 
 		if(liftUpBtn.isPressed()){
-			liftMotor.moveVelocity(80);
+			liftMotor.moveVelocity(200);
 		}
 		else if(liftDownBtn.isPressed()){
 			if(limitSwitch.get_value()==false){
-				liftMotor.moveVelocity(-80);
+				liftMotor.moveVelocity(-150);
 			}
 			else{
 				liftMotor.moveVelocity(0);
-				master.rumble("-."); //fun fact: this is "n" in morse code! (meaning the lift can't move any more)
+				master.rumble("-."); 
+				//fun fact: this is "n" in morse code! (meaning no, the lift can't move any more)
+				//it would be "no", but it was just buzzing too much and sending everyone crazy
 			}
 		}
 		else{
@@ -151,23 +159,17 @@ void opcontrol() {
 		}
 
 		
-		if(stickUpBtn.isPressed()){
-			stickMotor.moveVelocity(25);
-		}
-		else if (stickDownBtn.isPressed()) {
-			stickMotor.moveVelocity(-25);
-		}
-		else{
-			stickMotor.moveVelocity(0);
+		
+		//the button changes the state of the hook pneumatic
+		//(each time it is pressed)
+		if(goalLiftPneumBtn.changedToPressed()){
+			goalLiftBool = !goalLiftBool;
 		}
 
-		if(stickPneumBtn.changedToPressed()){
-			stickBool = !stickBool;
-		}
-
-		stickPneum.set_value(stickBool);
+		goalLiftPneum.set_value(goalLiftBool);
 	
 
+		//the standard delay in a while loop :)
 		pros::delay(20);
 	}
 

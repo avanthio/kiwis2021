@@ -3,12 +3,14 @@
 #include "pros/llemu.hpp"
 
 void setBrakeTypes(){
- leftBackMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
- rightBackMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
- rightFrontMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
- leftFrontMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+ leftBackMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+ leftMiddleMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+ rightMiddleMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+ rightBackMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+ rightFrontMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+ leftFrontMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
  intakeMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
- hookMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
+ //hookMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
  liftMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
  //stickMotor.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 }
@@ -22,12 +24,23 @@ void resetDevices(){
   rightBackMotor.tarePosition();
   leftBackMotor.tarePosition();
   rightFrontMotor.tarePosition();
-  hookMotor.tarePosition();
+  //hookMotor.tarePosition();
   liftMotor.tarePosition();
   //stickMotor.tarePosition();
   goalLiftPneum.set_value(false);
-  //stickPneum.set_value(true);
+  hookPneum.set_value(true);
+  fourBar.reset();
   while(inertialSens.is_calibrating()){
     pros::delay(20);
   }
+}
+
+//convert an angle measure in degrees to radians
+double degreesToRadians(double inputInDegrees){
+  return inputInDegrees*M_PI/180;
+}
+
+//convert an angle measuer in radians to degrees
+double radiansToDegrees(double inputInRadians){
+  return inputInRadians*180/M_PI;
 }

@@ -80,6 +80,7 @@ void opcontrol(void);
  #include "pid.hpp"
  #include "drivetrain.hpp"
  #include "auton.hpp"
+ #include "lift.hpp"
 //#include <iostream>
 #endif
 

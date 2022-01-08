@@ -5,3 +5,6 @@
 extern void setBrakeTypes();
 
 extern void resetDevices();
+
+extern double radiansToDegrees(double inputInRadians);
+extern double degreesToRadians(double inputInDegrees);

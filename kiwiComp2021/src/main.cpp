@@ -128,7 +128,7 @@ void opcontrol() {
   int rightBackSpeed;
   bool goalLiftBool = 0;
   bool driveDirectBool = 0;
-  bool hookBool = 1;
+  bool hookBool = 0;
 
 
   while (true) {

@@ -154,7 +154,7 @@ void Lift::moveToAngle(){
             liftMotor.moveVoltage(-goalVoltage);
         }
    
-        if(abs(currentAngle-goalAng)<1){
+        if(abs(currentAngle-goalAng)<2.5){
             std::cout<<"in range\n";
             std::cout<<"final angle is:"<<currentAngle<<'\n';
             break;

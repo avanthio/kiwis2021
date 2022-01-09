@@ -28,7 +28,7 @@ void resetDevices(){
   liftMotor.tarePosition();
   //stickMotor.tarePosition();
   goalLiftPneum.set_value(false);
-  hookPneum.set_value(true);
+  hookPneum.set_value(false);
   fourBar.reset();
   while(inertialSens.is_calibrating()){
     pros::delay(20);

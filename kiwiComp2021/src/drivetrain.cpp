@@ -273,7 +273,7 @@ void moveForwardCoast(double targetDistance, int veloc){
   int leftVelo = velo;
   int loopCount = 0;
   int rightVelo = velo;
-  int veloAdjust = 60;
+  int veloAdjust = 1;
   double adjustVelocityPCT;
   double initialInert = inertialSens.get_rotation();
   double currInert = initialInert;
@@ -311,16 +311,23 @@ void moveForwardCoast(double targetDistance, int veloc){
 
       // only adjust the direction of the robot if it is off
       // by more than one degree
-      if (abs(headingErr) > 1) {
+    if (abs(headingErr) > 1) {
         // why does it only adjust one side, you ask?
         // because I don't want the robot to pivot or slow down too much
         // and it was being strange when I adjusted both sides
-      
+        if (headingErr < 0) {
+          leftVelo += veloAdjust;
+          // rightVelo veloAdjust;
+        } 
+        else {
+          // leftVelo -=veloAdjust;
+          rightVelo += veloAdjust;
+        }
       } 
-      else {
+    else {
         leftVelo = veloc;
         rightVelo = veloc;
-      }
+    }
 
       leftFrontMotor.moveVelocity(leftVelo);
       leftMiddleMotor.moveVelocity(leftVelo);

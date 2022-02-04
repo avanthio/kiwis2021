@@ -23,13 +23,13 @@ okapi::Motor  leftFrontMotor(5,false, okapi::AbstractMotor::gearset::green, okap
 okapi::Motor  leftBackMotor(16,false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
 okapi::Motor  rightFrontMotor(6,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
 okapi::Motor  rightBackMotor(18,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  intakeMotor(7, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  intakeMotor(2, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::degrees);
 //okapi::Motor  hookMotor(2, true, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  liftRightMotor(11,false,okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  liftMotor(11,true,okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
 //okapi::Motor  stickMotor(20, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor liftLeftMotor(20, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+//okapi::Motor liftLeftMotor(20, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
 
-okapi::MotorGroup liftMotor({liftRightMotor,liftLeftMotor});
+//okapi::MotorGroup liftMotor({ liftRightMotor,liftLeftMotor});
 pros::Imu inertialSens(14);
 pros::ADIDigitalOut goalLiftPneum('A');
 pros::ADIDigitalOut hookPneum('C');  

@@ -200,7 +200,7 @@ void moveForward(double targetDistance, int veloc, bool hookBool){
     if(hookBool == true){
         sign = getSign(velo);
         if(sign == -1 && notSetAlready == true){
-          hookPneum.set_value(false);
+          hookPneum.set_value(true);
           notSetAlready = false;
         }
     }

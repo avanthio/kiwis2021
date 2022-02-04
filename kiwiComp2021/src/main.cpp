@@ -10,7 +10,7 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-int chosenAuton = 3; //1 = wp and goal right, 2 = wp and goal left 
+int chosenAuton = 2; //1 = wp and goal right, 2 = wp and goal left 
 //3 = skills
 void initialize() {
   //set the brake type of all the motors
@@ -93,31 +93,7 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-
-
-  /*struct Position unadjustedPos = getCurrXangY();
-  std::cout<<"Unadjusted position:"<<unadjustedPos.x<<","<<unadjustedPos.y<<")\n";
-  pros::delay(10);
-  double currAng = limitAngle(gpsSens.get_heading()+180);
-  std::cout<<"currAng = "<<currAng<<"\n";
-  pros::delay(10);
   
-  struct Position currP = getCurrXandY(currAng);
-  std::cout<<"starting x and y are:"<<"("<<currP.x<<","<<currP.y<<")\n";
-  pros::delay(20);
-  struct Position goalP = {0,-0.5,0};
-  //pros::delay(20000);*/
-  
- 
-
-
-  
-
-  
-  
-  /*struct Position goalPos = {-20,75,0};
-  moveToPosition(goalPos);*/
-  //moveToPosition(goalP);
   //used to store values of controller joysticks
   int axis2 = 0;
   int axis3 = 0;
@@ -129,7 +105,7 @@ void opcontrol() {
   bool goalLiftBool = 0;
   bool driveDirectBool = 0;
   bool hookBool = 0;
-
+  bool intakeBool = 0;
 
   while (true) {
 
@@ -155,12 +131,17 @@ void opcontrol() {
     rightBackMotor.moveVelocity(rightBackSpeed);
     
     //no, we don't have an intake, but yes, this is still here :)
-    if(intakeInBtn.isPressed()){
-      intakeMotor.moveVelocity(200);
+    if(intakeInBtn.changedToPressed()){
+      intakeBool = !intakeBool;
+    }
+    
+    if(intakeBool){
+      intakeMotor.moveVelocity(190);
     }
     else{
-      intakeMotor.moveVelocity(0); 
+      intakeMotor.moveVelocity(0);
     }
+
 
 
     if(hookPneumBtn.changedToPressed()){
@@ -172,11 +153,11 @@ void opcontrol() {
 
 
     if(liftUpBtn.isPressed()){
-      liftMotor.moveVelocity(200);
+      liftMotor.moveVelocity(100);
     }
     else if(liftDownBtn.isPressed()){
       if(limitSwitch.get_value()==false){
-        liftMotor.moveVelocity(-150);
+        liftMotor.moveVelocity(-75);
       }
       else{
         liftMotor.moveVelocity(0);

@@ -25,10 +25,10 @@ extern okapi::Motor  rightFrontMotor;
 extern okapi::Motor  rightBackMotor;
 extern okapi::Motor  intakeMotor;
 //extern okapi::Motor  hookMotor;
-extern okapi::Motor  liftLeftMotor;
+extern okapi::Motor  liftMotor;
 //extern okapi::Motor  stickMotor;
-extern okapi::Motor  liftRightMotor;
-extern okapi::MotorGroup liftMotor;
+//extern okapi::Motor  liftRightMotor;
+//extern okapi::MotorGroup liftMotor;
 
 extern pros::Imu inertialSens;
 //declare the pneumatics

@@ -7,21 +7,25 @@
 //it grabs a goal from the neutral zone and also
 //scores a ring in our alliance goal and moves it away
 //from the bonus line
+
 void wpAndGoalRight(){
   fourBar.setGoalAngleAndVolt(0, 8000);
-  fourBar.moveToAngle();
   pros::delay(100);
-  moveForward(44.5,200,true);
-  hookPneum.set_value(true);
-  fourBar.setGoalAngleAndVolt(5, 8000);
+  moveForwardTest(44.5,200,true,5);
+  fourBar.setGoalAngleAndVolt(10, 8000);
   fourBar.moveToAngle();
   moveForward(-28.5,200);
   turnForDegrees(-90);
-  moveForwardCoast(-10,-150);
+  moveForwardCoast(-12,-50);
   pros::delay(1000);
   goalLiftPneum.set_value(true);
+  fourBar.setGoalAngleAndVolt(20, 8000);
+  fourBar.moveToAngle();
   moveForward(25,100);
-  goalLiftPneum.set_value(false);
+  intakeMotor.moveVelocity(190);
+  pros::delay(1000);
+  intakeMotor.moveVelocity(0);
+  
 }
 
 //this is the other risky auton (~8/10 success rate):
@@ -29,29 +33,32 @@ void wpAndGoalRight(){
 //scores a ring in our alliance goal on the "left" side of the field
 void wpAndGoalLeft(){
   fourBar.setGoalAngleAndVolt(0, 8000);
-  fourBar.moveToAngle();
   pros::delay(100);
-  moveForward(52,200,true);
-  hookPneum.set_value(true);
-  fourBar.setGoalAngleAndVolt(5, 8000);
+  moveForwardTest(49,200,true,5);
+  fourBar.setGoalAngleAndVolt(10, 8000);
   fourBar.moveToAngle();
-  moveForward(-46,200);
-  turnForDegrees(-80);
-  moveForwardCoast(-10,-100);
+  moveForward(-50,200);
+  turnForDegrees(-90);
+  fourBar.setGoalAngleAndVolt(20, 8000);
+  fourBar.moveToAngle();
+  moveForwardCoast(-7,-50);
   goalLiftPneum.set_value(true);
-  pros::delay(500);
-  goalLiftPneum.set_value(false);
+  pros::delay(1000);
+  moveForwardCoast(10,50);
+  intakeMotor.moveVelocity(190);
+  pros::delay(1000);
+  intakeMotor.moveVelocity(0);
 
 }
 
 
 void autonSkills(){
 
-  fourBar.setGoalAngleAndVolt(0, 10000);
-  fourBar.moveToAngle();
   moveForwardCoast(-5,-50);
   goalLiftPneum.set_value(true);
   moveForwardCoast(10,50);
+  fourBar.setGoalAngleAndVolt(0, 10000);
+  fourBar.moveToAngle();
   turnForDegrees(90);
   moveForwardCoast(15,100);
   struct Position goalPos = {-0.2,1,0};
@@ -65,7 +72,7 @@ void autonSkills(){
   moveToPosition(goalPos);
   fourBar.setGoalAngleAndVolt(90,10000);
   fourBar.moveToAngle();
-  goalPos = {1.19,0.15,0};
+  goalPos = {1.19,0.2,0};
   moveToPosition(goalPos);
   fourBar.setGoalAngleAndVolt(50,10000);
   fourBar.moveToAngle();

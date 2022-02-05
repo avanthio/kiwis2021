@@ -190,7 +190,7 @@ void moveForward(double targetDistance, int veloc, bool hookBool){
     
     
     if(loopCount%20 == 0||abs(currEnc-goal)<50){
-      std::cout<<currEnc<<"\n";
+      //std::cout<<currEnc<<"\n";
     }
     distanceErr = calcDriveDistance(goal - currEnc);
 
@@ -202,6 +202,7 @@ void moveForward(double targetDistance, int veloc, bool hookBool){
         if(sign == -1 && notSetAlready == true){
           hookPneum.set_value(true);
           notSetAlready = false;
+          std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
         }
     }
 
@@ -252,6 +253,7 @@ void moveForward(double targetDistance, int veloc, bool hookBool){
     loopCount +=1;
   }
 
+  std::cout<<"finished at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n'<<"or this many inches:"<< calcDriveDistance(currEnc)<<'\n';
   leftFrontMotor.moveVelocity(0);
   leftMiddleMotor.moveVelocity(0);
   rightMiddleMotor.moveVelocity(0);
@@ -261,6 +263,124 @@ void moveForward(double targetDistance, int veloc, bool hookBool){
 
 }
 
+void liftMove(){
+  fourBar.moveToAngle();
+}
+
+void moveForwardTest(double targetDistance, int veloc, bool hookBool, double distanceForArmMotion){
+  forwardPID.reset();
+
+  int x = 0;
+  int velo = veloc;
+  double goal = calcDriveDegrees(targetDistance);
+  double moveArmHere = calcDriveDegrees(distanceForArmMotion);
+  double distanceErr;
+  double currEnc = 0;
+  int leftVelo = velo;
+  int loopCount = 0;
+  int rightVelo = velo;
+  int veloAdjust = 60;
+  double adjustVelocityPCT;
+  double initialInert = inertialSens.get_rotation();
+  double currInert = initialInert;
+  double headingErr = currInert - initialInert;
+  int sign;
+  bool notSetAlready = true;
+  bool armNotToldToMove = true;
+
+  pros::delay(20);
+
+  leftFrontMotor.tarePosition();
+  rightFrontMotor.tarePosition();
+  leftBackMotor.tarePosition();
+  rightBackMotor.tarePosition();
+
+  pros::delay(loopDelay);
+
+  while (1) {
+    currEnc = (leftFrontMotor.getPosition() + rightFrontMotor.getPosition() +
+               rightBackMotor.getPosition() + leftBackMotor.getPosition()) /
+              4.0;
+
+    if(abs(currEnc-moveArmHere)<10 && armNotToldToMove){
+      pros::Task liftMotionTask(liftMove);
+      armNotToldToMove = false;
+      std::cout<<"told arm to move!"<<"\n";
+    }
+    
+    if(loopCount%20 == 0||abs(currEnc-goal)<50){
+      //std::cout<<currEnc<<"\n";
+    }
+    distanceErr = calcDriveDistance(goal - currEnc);
+
+    
+    velo = forwardPID.getOutput(-distanceErr);
+
+    if(hookBool == true){
+        sign = getSign(velo);
+        if(sign == -1 && notSetAlready == true){
+          hookPneum.set_value(true);
+          notSetAlready = false;
+          std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
+        }
+    }
+
+    currInert = inertialSens.get_rotation();
+    headingErr = currInert - initialInert;
+    //if (abs(goal - currEnc) > 15) {
+
+      // only adjust the direction of the robot if it is off
+      // by more than one degree
+      if (abs(headingErr) > 1) {
+        // why does it only adjust one side, you ask?
+        // because I don't want the robot to pivot or slow down too much
+        // and it was being strange when I adjusted both sides
+        if (headingErr < 0) {
+          leftVelo += veloAdjust;
+          // rightVelo veloAdjust;
+        } 
+        else {
+          // leftVelo -=veloAdjust;
+          rightVelo += veloAdjust;
+        }
+      } 
+      else {
+        leftVelo = velo;
+        rightVelo = velo;
+      }
+
+      leftFrontMotor.moveVoltage(leftVelo);
+      leftMiddleMotor.moveVoltage(leftVelo);
+      leftBackMotor.moveVoltage(leftVelo);
+      rightFrontMotor.moveVoltage(rightVelo);
+      rightMiddleMotor.moveVoltage(rightVelo);
+      rightBackMotor.moveVoltage(rightVelo);
+    
+
+    if(abs(goal-currEnc)<10){
+      x+=1;
+    }
+    else{
+      x=0;
+    }
+
+    if(x>10){
+      break;
+    }
+
+    pros::delay(loopDelay);
+    loopCount +=1;
+  }
+
+  std::cout<<"finished at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n'<<"or this many inches:"<< calcDriveDistance(currEnc)<<'\n';
+  leftFrontMotor.moveVelocity(0);
+  leftMiddleMotor.moveVelocity(0);
+  rightMiddleMotor.moveVelocity(0);
+  rightFrontMotor.moveVelocity(0);
+  leftBackMotor.moveVelocity(0);
+  rightBackMotor.moveVelocity(0);
+
+}
 
 void moveForwardCoast(double targetDistance, int veloc){
   forwardPID.reset();
@@ -440,7 +560,7 @@ struct Position getCurrXandY(double currAngl) {
   current.x = currentStatus.x;
   current.y = currentStatus.y;
   double xOffset = 0.15;
-  double yOffset = 0.13;
+  double yOffset = 0.088;
   double alpha = atan(yOffset/xOffset);
   alpha = radiansToDegrees(alpha);
   alpha = limitAngle(alpha);

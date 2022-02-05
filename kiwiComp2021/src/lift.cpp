@@ -1,4 +1,5 @@
 #include "lift.hpp"
+#include "pros/misc.hpp"
 using namespace kiwiLift;
 
 pros::Rotation liftEnc(19);
@@ -38,14 +39,14 @@ double Lift::getHeight(){
 }
 
 void Lift::setGoalAngle(double gAng){
-    liftMutex.take(100);
+    liftMutex.take(200);
     goalAngle = gAng;
     std::cout<<"goal angle is:"<<goalAngle<<"\n";
     liftMutex.give();
 }
 
 void Lift::setGoalVolt(double gVolt){
-    liftMutex.take(100);
+    liftMutex.take(200);
     goalVolt = gVolt;
     std::cout<<"goal voltage is:"<<goalVolt<<"\n";
     liftMutex.give();
@@ -57,7 +58,7 @@ void Lift::setGoalAngleAndVolt(double goalA, double goalV){
 }
 
 void Lift::setToStart(){
-    liftMutex.take(100);
+    liftMutex.take(200);
     startLift = true;
     std::cout<<"starting lift..."<<startLift<<"\n";
     liftMutex.give();
@@ -65,6 +66,7 @@ void Lift::setToStart(){
 
 void Lift::move(){
    bool shouldMove = false;
+   while(pros::competition::is_autonomous()){
    liftMutex.take(200);
    if(startLift == true){
        shouldMove = true;
@@ -82,11 +84,14 @@ void Lift::move(){
    }
    else{
    }
+
+   pros::delay(20);
+   }
 }
 
 double Lift::getAngle(){
     double currAngl;
-    liftMutex.take(100);
+    liftMutex.take(200);
     currAngl = liftEnc.get_angle()/(100.0);
     if(currAngl>180){
         currAngl-=360;

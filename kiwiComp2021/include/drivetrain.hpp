@@ -18,3 +18,4 @@ extern void moveForwardCoast(double targetDistance, int velo);
 extern void turnForDegrees(double turnAngle);
 extern void turnToFacePosition(struct Position goal);
 extern void moveToPosition(struct Position goal);
+extern void moveForwardTest(double targetDistance, int veloc, bool hookBool, double distanceForArmMotion);

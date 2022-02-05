@@ -9,6 +9,7 @@ extern okapi::Controller master;
 extern okapi::ControllerButton liftUpBtn;
 extern okapi::ControllerButton liftDownBtn;
 extern okapi::ControllerButton intakeInBtn;
+extern okapi::ControllerButton intakeReverseBtn;
 extern okapi::ControllerButton hookPneumBtn;
 extern okapi::ControllerButton goalLiftPneumBtn;
 //extern okapi::ControllerButton stickUpBtn;

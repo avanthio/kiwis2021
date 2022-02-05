@@ -15,15 +15,15 @@ namespace kiwiLift{
         void setToStart();//tell the lift thread to start the lift?
         void move();//the function called in the lift thread to move the lift/check if the lift should be moved
         void moveToAngle();//move the lift to its goal height at its goal voltage
-
+        double getAngle();//get the current angle of the lift
+        
     private:
         double armLength;
         double towerHeight;
         double currVolt;
         double goalVolt;  
         double goalAngle;
-        bool startLift;
-        double getAngle();//get the current angle of the lift   
+        bool startLift;   
         double calcHeight(double);//calculate the height of the lift based on its current angle
         double calcAngle(double);//calculate the angle of the lift based on its current height
         pros::Mutex liftMutex;//threadsafety - use when accessing any lift variables/encoders :)

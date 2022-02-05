@@ -3,6 +3,7 @@
 #include "device_setup.hpp"
 #include "drivetrain.hpp"
 #include "lift.hpp"
+#include "pros/rtos.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -10,7 +11,7 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-int chosenAuton = 2; //1 = wp and goal right, 2 = wp and goal left 
+int chosenAuton = 3; //1 = wp and goal right, 2 = wp and goal left 
 //3 = skills
 void initialize() {
   //set the brake type of all the motors
@@ -60,10 +61,11 @@ void competition_initialize() {
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
+
+
 void autonomous() {
 
 
-  
   
   //because I'm lazy and just want to change a number at the top of the file 
   //instead of digging around for it
@@ -92,6 +94,7 @@ void autonomous() {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
 void opcontrol() {
   
   //used to store values of controller joysticks
@@ -135,20 +138,30 @@ void opcontrol() {
       intakeBool = !intakeBool;
     }
     
-    if(intakeBool){
-      intakeMotor.moveVelocity(190);
+    if(fourBar.getAngle()<13){
+      intakeMotor.moveVelocity(0);
+      intakeBool = false;
     }
     else{
-      intakeMotor.moveVelocity(0);
+      if(intakeReverseBtn.isPressed()){
+        intakeMotor.moveVelocity(-300);
+        intakeBool = false;
+      }
+      else{
+        if(intakeBool){
+          intakeMotor.moveVelocity(190);
+        }
+        else{
+          intakeMotor.moveVelocity(0);
+        }
+      }
     }
-
-
 
     if(hookPneumBtn.changedToPressed()){
       hookBool = !hookBool;
+      hookPneum.set_value(hookBool);
     }
     
-    hookPneum.set_value(hookBool);
     
 
 
@@ -176,9 +189,9 @@ void opcontrol() {
     //(each time it is pressed)
     if(goalLiftPneumBtn.changedToPressed()){
       goalLiftBool = !goalLiftBool;
+      goalLiftPneum.set_value(goalLiftBool);
     }
 
-    goalLiftPneum.set_value(goalLiftBool);
   
 
     //the standard delay in a while loop :)

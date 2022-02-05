@@ -11,6 +11,7 @@ okapi::ControllerButton liftDownBtn(okapi::ControllerDigital::R2);
 okapi::ControllerButton intakeInBtn(okapi::ControllerDigital::Y); //was L1
 okapi::ControllerButton hookPneumBtn(okapi::ControllerDigital::L1); // was Y
 okapi::ControllerButton goalLiftPneumBtn(okapi::ControllerDigital::L2);
+okapi::ControllerButton intakeReverseBtn(okapi::ControllerDigital::B);
 //okapi::ControllerButton stickUpBtn(okapi::ControllerDigital::up);
 //okapi::ControllerButton stickDownBtn(okapi::ControllerDigital::down);
 //okapi::ControllerButton stickPneumBtn(okapi::ControllerDigital::left);
@@ -35,5 +36,5 @@ pros::ADIDigitalOut goalLiftPneum('A');
 pros::ADIDigitalOut hookPneum('C');  
 pros::ADIDigitalIn limitSwitch('B');
 
-pros::Gps gpsSens(21);
+pros::Gps gpsSens(13);
 //port, x pos, y pos, heading, x relative to center of rotation, y relative to center of rotation (all in meters, degrees)

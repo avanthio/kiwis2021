@@ -6,7 +6,8 @@
 
 const int loopDelay = 20;
   
-KiwiPID turnPID(350,20,1400);
+KiwiPID turnPID(350,30,1400);//i was 20
+KiwiPID turnPID2(1000,200,10);
 KiwiPID straightPID(10000,180,390);//(500,10,20)//1000,1,20
 KiwiPID angleAdjustPID((6.0/360.0),0,0);//going to coordinates
 KiwiPID angleCorrectionPID(1.0/100.0,0,0);//going for a relative distance
@@ -20,6 +21,8 @@ void setUpPIDs(){
 
   turnPID.setMaxOutput(12000);
   turnPID.setMinOutput(-12000);
+  turnPID2.setMaxOutput(12000);
+  turnPID2.setMinOutput(-12000);
   straightPID.setMaxOutput(12000);
   straightPID.setMinOutput(-12000);
   forwardPID.setMaxOutput(12000);
@@ -32,6 +35,7 @@ void setUpPIDs(){
   angleCorrectionPID.setMinOutput(-12000);
 
   turnPID.setSetpoint(0);
+  turnPID2.setSetpoint(0);
   straightPID.setSetpoint(0);
   angleAdjustPID.setSetpoint(0);
   forwardPID.setSetpoint(0);
@@ -42,9 +46,13 @@ void setUpPIDs(){
   turnPID.setIMin(0);
   turnPID.setMaxErrForI(5);
   turnPID.setDeadzone(0);
-  straightPID.setIMax(6000);
+  turnPID2.setIMax(12000);
+  turnPID2.setIMin(0);
+  turnPID2.setMaxErrForI(20);
+  turnPID2.setDeadzone(0);
+  straightPID.setIMax(12000);
   straightPID.setIMin(0);
-  straightPID.setMaxErrForI(10);
+  straightPID.setMaxErrForI(1);
   straightPID.setDeadzone(0);
   angleAdjustPID.setIMax(6000);
   angleAdjustPID.setDeadzone(0);
@@ -597,6 +605,76 @@ void turnForDegrees(double turnAngle) {
   rightBackMotor.moveVelocity(0);
 }
 
+void turnForDegrees2(double turnAngle) {
+  //std::cout<<"loop count, rotation error, pid output\n";
+  turnPID2.reset();
+  double currRotation = inertialSens.get_rotation();
+  double goalRotation = currRotation + turnAngle;
+  int leftVeloc;
+  int rightVeloc;
+  int veloc = 0;
+  int x = 0;
+  double lastRotationErr;
+  double rotationErr = currRotation - goalRotation;
+  double avgRotationErrChange;
+  int loopCount = 0;
+  while (1) {
+
+    veloc = turnPID.getOutput(rotationErr);
+    if(loopCount%2 == 0&&loopCount<200){
+      //std::cout<<loopCount<<","<<rotationErr<<","<<veloc<<"\n";
+    }
+    
+    leftVeloc = veloc;
+    rightVeloc = -veloc;
+    
+
+    leftFrontMotor.moveVoltage(leftVeloc);
+    leftMiddleMotor.moveVoltage(leftVeloc);
+    leftBackMotor.moveVoltage(leftVeloc);
+    rightFrontMotor.moveVoltage(rightVeloc);
+    rightMiddleMotor.moveVoltage(rightVeloc);
+    rightBackMotor.moveVoltage(rightVeloc);
+
+    if (abs(rotationErr) < 0.5) {
+      x += 1;
+    }
+    else{
+      x = 0;
+    }
+
+    if (x >= 10) {
+      break;
+    }
+
+    /*if(loopCount%10==0){
+      avgRotationErrChange = avgRotationErrChange/10;
+      if(avgRotationErrChange<0.1){
+        break;
+      }
+      else{
+        avgRotationErrChange = 0;
+      }
+    }*/
+
+    lastRotationErr = rotationErr;
+    currRotation = inertialSens.get_rotation();
+    rotationErr = currRotation - goalRotation;
+    avgRotationErrChange += (rotationErr-lastRotationErr);
+    //std::cout<<rotationErr<<"\n";
+    loopCount+=1;
+    pros::delay(loopDelay);
+  }
+
+  std::cout<<"loopcount:"<<loopCount<<"rotationErr:"<<rotationErr<<"\n";
+  leftFrontMotor.moveVelocity(0);
+  leftMiddleMotor.moveVelocity(0);
+  rightFrontMotor.moveVelocity(0);
+  rightMiddleMotor.moveVelocity(0);
+  leftBackMotor.moveVelocity(0);
+  rightBackMotor.moveVelocity(0);
+}
+
 struct Position getCurrXangY() {
   struct Position current;
   pros::c::gps_status_s_t currentStatus = gpsSens.get_status();
@@ -664,7 +742,7 @@ void turnToFacePosition(struct Position goal){
   double angleErr = limitAngleVTwo(headingToGoalPos-currentAngle);
   std::cout<<angleErr;
 
-  turnForDegrees(angleErr);
+  turnForDegrees2(angleErr);
 
 }
 

@@ -11,8 +11,8 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-int chosenAuton = 1; //1 = wp and goal right, 2 = wp and goal left 
-//3 = skills
+int chosenAuton = 4; //1 = wp and goal right, 2 = wp and goal left 
+//3 = skills 4 = full wp
 void initialize() {
   //set the brake type of all the motors
   setBrakeTypes();
@@ -78,6 +78,9 @@ void autonomous() {
   else if (chosenAuton == 3){
     autonSkills();
   }
+  else if (chosenAuton == 4){
+    fullWP();
+  }
 
 }
 
@@ -96,20 +99,7 @@ void autonomous() {
  */
 
 void opcontrol() {
-  fourBar.setGoalAngleAndVolt(0, 8000);
-  moveForwardTest(39, true, 5);
-  moveForward(-25);
-  fourBar.setGoalAngleAndVolt(20,8000);
-  fourBar.moveToAngle();
-  turnForDegrees(-90);
-  moveForwardCoast(-11,8000);
-  goalLiftPneum.set_value(true);
-  pros::delay(2000);
-  moveForward(15);
-  intakeMotor.moveVelocity(190);
-  pros::delay(3000);
-  goalLiftPneum.set_value(false);
-  /*//used to store values of controller joysticks
+  //used to store values of controller joysticks
   int axis2 = 0;
   int axis3 = 0;
   //used to store speed of each motor
@@ -208,6 +198,6 @@ void opcontrol() {
 
     //the standard delay in a while loop :)
     pros::delay(20);
-  }*/
+  }
 
 }

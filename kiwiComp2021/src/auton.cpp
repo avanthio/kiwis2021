@@ -11,17 +11,17 @@
 void wpAndGoalRight(){
   fourBar.setGoalAngleAndVolt(0, 8000);
   pros::delay(100);
-  moveForwardTest(44.5,200,true,5);
+  moveForwardTest(44.5,true,5);
   fourBar.setGoalAngleAndVolt(10, 8000);
   fourBar.moveToAngle();
-  moveForward(-28.5,200);
+  moveForward(-28.5);
   turnForDegrees(-90);
   moveForwardCoast(-12,-50);
   pros::delay(1000);
   goalLiftPneum.set_value(true);
   fourBar.setGoalAngleAndVolt(20, 8000);
   fourBar.moveToAngle();
-  moveForward(25,100);
+  moveForward(25);
   intakeMotor.moveVelocity(190);
   pros::delay(1000);
   intakeMotor.moveVelocity(0);
@@ -34,10 +34,10 @@ void wpAndGoalRight(){
 void wpAndGoalLeft(){
   fourBar.setGoalAngleAndVolt(0, 8000);
   pros::delay(100);
-  moveForwardTest(49,200,true,5);
+  moveForwardTest(49,true,5);
   fourBar.setGoalAngleAndVolt(10, 8000);
   fourBar.moveToAngle();
-  moveForward(-50,200);
+  moveForward(-50);
   turnForDegrees(-90);
   fourBar.setGoalAngleAndVolt(20, 8000);
   fourBar.moveToAngle();

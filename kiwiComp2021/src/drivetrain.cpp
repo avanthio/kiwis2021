@@ -3,13 +3,14 @@
 #include "device_setup.hpp"
 #include "okapi/api/filter/averageFilter.hpp"
 
+bool gpsErrOut = false;
 
 const int loopDelay = 20;
   
 KiwiPID turnPID(350,30,1400);//i was 20
-KiwiPID turnPID2(1000,200,10);
-KiwiPID straightPID(10000,180,390);//(500,10,20)//1000,1,20
-KiwiPID angleAdjustPID((6.0/360.0),0,0);//going to coordinates
+KiwiPID turnPID2(500,40,1400);
+KiwiPID straightPID(400,90,200);//(500,10,20)//1000,1,20//40 integral was really good
+KiwiPID angleAdjustPID((8.0/360.0),0,0);//going to coordinates
 KiwiPID angleCorrectionPID(1.0/100.0,0,0);//going for a relative distance
 KiwiPID forwardPID(1500,0,0);
 KiwiPID stForwardPID(1500,150,2400);
@@ -48,11 +49,11 @@ void setUpPIDs(){
   turnPID.setDeadzone(0);
   turnPID2.setIMax(12000);
   turnPID2.setIMin(0);
-  turnPID2.setMaxErrForI(20);
+  turnPID2.setMaxErrForI(5);
   turnPID2.setDeadzone(0);
   straightPID.setIMax(12000);
   straightPID.setIMin(0);
-  straightPID.setMaxErrForI(1);
+  straightPID.setMaxErrForI(2);
   straightPID.setDeadzone(0);
   angleAdjustPID.setIMax(6000);
   angleAdjustPID.setDeadzone(0);
@@ -182,6 +183,16 @@ void moveForward(double targetDistance, bool hookBool){
   angleCorrectionPID.reset();
   //std::cout<<"loop count, heading error, heading correction, i output\n";
 
+  if(gpsErrOut){
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
+
   int x = 0;
   int highestVelo = 0;
   int currVelo;
@@ -238,7 +249,7 @@ void moveForward(double targetDistance, bool hookBool){
         if(sign == -1 && notSetAlready == true){
           hookPneum.set_value(true);
           notSetAlready = false;
-          std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
+          //std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
           break;
         }
     }
@@ -290,7 +301,7 @@ void moveForward(double targetDistance, bool hookBool){
     loopCount +=1;
   }
 
-  std::cout<<"finished at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n'<<"or this many inches:"<< calcDriveDistance(currEnc)<<'\n';
+  //std::cout<<"finished at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n'<<"or this many inches:"<< calcDriveDistance(currEnc)<<'\n';
   leftFrontMotor.moveVelocity(0);
   leftMiddleMotor.moveVelocity(0);
   rightMiddleMotor.moveVelocity(0);
@@ -307,6 +318,16 @@ void liftMove(){
 void moveForwardTest(double targetDistance, bool hookBool, double distanceForArmMotion){
   forwardPID.reset();
   angleCorrectionPID.reset();
+
+  if(gpsErrOut){
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
 
   int x = 0;
   int velo;
@@ -336,6 +357,8 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
   pros::delay(loopDelay);
 
   while (1) {
+    
+
     currEnc = (leftFrontMotor.getPosition() + rightFrontMotor.getPosition() +
                rightBackMotor.getPosition() + leftBackMotor.getPosition()) /
               4.0;
@@ -343,7 +366,7 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
     if(abs(currEnc-moveArmHere)<10 && armNotToldToMove){
       pros::Task liftMotionTask(liftMove);
       armNotToldToMove = false;
-      std::cout<<"told arm to move!"<<"\n";
+      //std::cout<<"told arm to move!"<<"\n";
     }
     
     if(loopCount%20 == 0||abs(currEnc-goal)<50){
@@ -359,7 +382,7 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
         if(abs(distanceErr)<0.7&&notSetAlready){
           hookPneum.set_value(true);
           notSetAlready = false;
-          std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
+          //std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
           break;
         }
     }
@@ -423,6 +446,15 @@ void moveForwardCoast(double targetDistance, int veloc){
   stForwardPID.reset();
   angleCorrectionPID.reset();
 
+  if(gpsErrOut){
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
   int x = 0;
   int highestVelo = 0;
   int currVelo;
@@ -522,7 +554,7 @@ void moveForwardCoast(double targetDistance, int veloc){
     loopCount +=1;
   }
 
-  std::cout<<"finished at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n'<<"or this many inches:"<< calcDriveDistance(currEnc)<<'\n';
+  //std::cout<<"finished at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n'<<"or this many inches:"<< calcDriveDistance(currEnc)<<'\n';
   leftFrontMotor.moveVelocity(0);
   leftMiddleMotor.moveVelocity(0);
   rightMiddleMotor.moveVelocity(0);
@@ -548,6 +580,17 @@ void turnForDegrees(double turnAngle) {
   double rotationErr = currRotation - goalRotation;
   double avgRotationErrChange;
   int loopCount = 0;
+
+  if(gpsErrOut){
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
+
   while (1) {
 
     veloc = turnPID.getOutput(rotationErr);
@@ -577,7 +620,7 @@ void turnForDegrees(double turnAngle) {
       break;
     }
 
-    /*if(loopCount%10==0){
+    /*if(loopCount%20==0){
       avgRotationErrChange = avgRotationErrChange/10;
       if(avgRotationErrChange<0.1){
         break;
@@ -596,7 +639,7 @@ void turnForDegrees(double turnAngle) {
     pros::delay(loopDelay);
   }
 
-  std::cout<<"loopcount:"<<loopCount<<"rotationErr:"<<rotationErr<<"\n";
+  //std::cout<<"loopcount:"<<loopCount<<"rotationErr:"<<rotationErr<<"\n";
   leftFrontMotor.moveVelocity(0);
   leftMiddleMotor.moveVelocity(0);
   rightFrontMotor.moveVelocity(0);
@@ -618,10 +661,21 @@ void turnForDegrees2(double turnAngle) {
   double rotationErr = currRotation - goalRotation;
   double avgRotationErrChange;
   int loopCount = 0;
+
+  if(gpsErrOut){
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
+
   while (1) {
 
-    veloc = turnPID.getOutput(rotationErr);
-    if(loopCount%2 == 0&&loopCount<200){
+    veloc = turnPID2.getOutput(rotationErr);
+    if(loopCount%4 == 0&&loopCount<150){
       //std::cout<<loopCount<<","<<rotationErr<<","<<veloc<<"\n";
     }
     
@@ -645,17 +699,19 @@ void turnForDegrees2(double turnAngle) {
 
     if (x >= 10) {
       break;
+      //std::cout<<"in the zone\n";
     }
 
-    /*if(loopCount%10==0){
+    if(loopCount%20==0){
       avgRotationErrChange = avgRotationErrChange/10;
-      if(avgRotationErrChange<0.1){
+      if(avgRotationErrChange<0.1&&loopCount>60){
+        //std::cout<<"got stuck\n";
         break;
       }
       else{
         avgRotationErrChange = 0;
       }
-    }*/
+    }
 
     lastRotationErr = rotationErr;
     currRotation = inertialSens.get_rotation();
@@ -666,7 +722,7 @@ void turnForDegrees2(double turnAngle) {
     pros::delay(loopDelay);
   }
 
-  std::cout<<"loopcount:"<<loopCount<<"rotationErr:"<<rotationErr<<"\n";
+  //std::cout<<"loopcount:"<<loopCount<<"rotationErr:"<<rotationErr<<"\n";
   leftFrontMotor.moveVelocity(0);
   leftMiddleMotor.moveVelocity(0);
   rightFrontMotor.moveVelocity(0);
@@ -694,6 +750,18 @@ struct Position getCurrXandY(double currAngl) {
   alpha = radiansToDegrees(alpha);
   alpha = limitAngle(alpha);
   double dist = sqrt(xOffset*xOffset+yOffset*yOffset);
+
+  if(currentStatus.x == PROS_ERR_F){
+      current.x = 101001010100101;
+      gpsErrOut = true;
+      leftFrontMotor.moveVelocity(0);
+      leftMiddleMotor.moveVelocity(0);
+      rightMiddleMotor.moveVelocity(0);
+      rightFrontMotor.moveVelocity(0);
+      leftBackMotor.moveVelocity(0);
+      rightBackMotor.moveVelocity(0);
+      return current;
+  }
   double gpsx = current.x;
   double gpsy = current.y;
   //std::cout<<"Curr y = "<<current.y<<"\n";
@@ -721,15 +789,26 @@ double limitAngleVTwo(double angle) {
     return angle;
 }
 void turnToFacePosition(struct Position goal){
-  std::cout<<"in function";
+  
+  //std::cout<<"in function";
   double currentAngle = gpsSens.get_heading()+180;
   currentAngle = limitAngle(currentAngle);
-  std::cout<<currentAngle;
+  //std::cout<<currentAngle;
   pros::delay(10);
 
   struct Position current = getCurrXandY(currentAngle);
-  std::cout<<"current x position is:"<<current.x<<"\n";
-  std::cout<<"current y position is:"<<current.y<<"\n";
+  //std::cout<<"current x position is:"<<current.x<<"\n";
+  //std::cout<<"current y position is:"<<current.y<<"\n";
+  if(current.x == 101001010100101){
+    gpsErrOut = true;
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
 
 
   double headingToGoalPos = calcHeadingToGoalPos(current, goal);
@@ -740,7 +819,17 @@ void turnToFacePosition(struct Position goal){
   }
 
   double angleErr = limitAngleVTwo(headingToGoalPos-currentAngle);
-  std::cout<<angleErr;
+  //std::cout<<angleErr;
+
+  if(gpsErrOut){
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
 
   turnForDegrees2(angleErr);
 
@@ -748,7 +837,7 @@ void turnToFacePosition(struct Position goal){
 
 // goal position must be in meters with center of field being (0,0)... and
 // clockwise positive heading...
-void moveToPosition(struct Position goal) {
+void moveToPosition(struct Position goal, bool liftArm, double distanceToStartLift) {
 
   okapi::AverageFilter<3> headingFilter;
   okapi::AverageFilter<3> xFilter;
@@ -760,7 +849,7 @@ void moveToPosition(struct Position goal) {
   straightPID.reset();
   angleAdjustPID.reset();
 
-
+  
   struct Position error;
 
   double distanceTravelled = 0;
@@ -781,16 +870,38 @@ void moveToPosition(struct Position goal) {
   int count = 0;
 
   bool distTooSmall = false;
+  bool liftAr = liftArm;
 
 
   currentAngle = gpsSens.get_heading()+180;
   currentAngle = limitAngle(currentAngle);
-  std::cout<<currentAngle;
+  //std::cout<<currentAngle;
   pros::delay(10);
 
   struct Position current = getCurrXandY(currentAngle);
-  std::cout<<"current x position is:"<<current.x<<"\n";
-  std::cout<<"current y position is:"<<current.y<<"\n";
+  if(current.x == 101001010100101){
+    gpsErrOut = true;
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
+
+  if(gpsErrOut){
+    leftFrontMotor.moveVelocity(0);
+    leftMiddleMotor.moveVelocity(0);
+    rightMiddleMotor.moveVelocity(0);
+    rightFrontMotor.moveVelocity(0);
+    leftBackMotor.moveVelocity(0);
+    rightBackMotor.moveVelocity(0);
+    return;
+  }
+  
+  //std::cout<<"current x position is:"<<current.x<<"\n";
+  //std::cout<<"current y position is:"<<current.y<<"\n";
   struct Position startOfDrive = current;
 
   double headingToGoalPos = calcHeadingToGoalPos(current, goal);
@@ -800,11 +911,11 @@ void moveToPosition(struct Position goal) {
     headingToGoalPos = limitAngle(headingToGoalPos + 180);
   }
 
-  std::cout<<"goal heading is"<<headingToGoalPos<<"\n";
+  //std::cout<<"goal heading is"<<headingToGoalPos<<"\n";
 
   double initialDistance = distanceToPoint(current, goal);
 
-  std::cout<<"initial distance is:"<<initialDistance<<'\n';
+  //std::cout<<"initial distance is:"<<initialDistance<<'\n';
 
   if (goal.reversed == true) {
     initialDistance *= -1;
@@ -815,9 +926,9 @@ void moveToPosition(struct Position goal) {
     distTooSmall = true;
   }
 
-  std::cout<<"initial heading is:"<<currentAngle<<'\n';
+  //std::cout<<"initial heading is:"<<currentAngle<<'\n';
   error.angle = headingToGoalPos - currentAngle;
-  std::cout<<"initial heading error is:"<<error.angle<<"\n";
+  //std::cout<<"initial heading error is:"<<error.angle<<"\n";
   error.angle = limitAngleVTwo(error.angle);
   pros::delay(10);
 
@@ -830,6 +941,16 @@ void moveToPosition(struct Position goal) {
     }
 
     current = getCurrXandY(currentAngle);
+    if(current.x == 101001010100101){
+      gpsErrOut = true;
+      leftFrontMotor.moveVelocity(0);
+      leftMiddleMotor.moveVelocity(0);
+      rightMiddleMotor.moveVelocity(0);
+      rightFrontMotor.moveVelocity(0);
+      leftBackMotor.moveVelocity(0);
+      rightBackMotor.moveVelocity(0);
+      break;
+    }
     
     if(loopCount<4){
       xFilter.filter(current.x);
@@ -852,7 +973,13 @@ void moveToPosition(struct Position goal) {
 
     distanceToGoalPos = initialDistance - distanceTravelled;
 
-    baseVoltage = straightPID.getOutput(-distanceToGoalPos);
+     if(abs(initialDistance - distanceToGoalPos)>= distanceToStartLift && liftAr){
+      pros::Task liftMotionTask(liftMove);
+      liftAr = false;
+      //std::cout<<"told arm to move!"<<"\n";
+    }
+
+    baseVoltage = straightPID.getOutput((-distanceToGoalPos*39.37));
 
     if (abs(distanceToGoalPos) > 0.1) {
       if (distTooSmall) {
@@ -901,8 +1028,9 @@ void moveToPosition(struct Position goal) {
     leftMiddleMotor.moveVoltage(baseVoltage - angleAdjustment);
     leftBackMotor.moveVoltage(baseVoltage - angleAdjustment);
 
-    if (abs(distanceToGoalPos) < 0.08) {
+    if (abs(distanceToGoalPos) < 0.04) {//was 0.08
       x += 1;
+      //std::cout<<"in zone at:"<<count<<"\n";
     } 
     else {
       x = 0;
@@ -920,11 +1048,12 @@ void moveToPosition(struct Position goal) {
     pros::delay(10);
     count += 1;
   }
-  std::cout<<"final angle is:"<<currentAngle<<"\n";
+  /*std::cout<<"final angle is:"<<currentAngle<<"\n";
   std::cout<<"final angle error is:"<<error.angle<<"\n";
   std::cout<<"final x and y are: "<<current.x<<","<<current.y<<"\n";
   std::cout<<"final distance error is:"<<distanceToGoalPos<<"\n";
-  std::cout<<"done\n";
+  std::cout<<"count is"<<count<<"\n";
+  std::cout<<"done\n";*/
   leftFrontMotor.moveVoltage(0);
   leftMiddleMotor.moveVoltage(0);
   leftBackMotor.moveVoltage(0);

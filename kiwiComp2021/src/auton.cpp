@@ -12,17 +12,28 @@ void wpAndGoalRight(){
   fourBar.setGoalAngleAndVolt(0, 8000);
   moveForwardTest(39, true, 5);
   moveForward(-25);
-  fourBar.setGoalAngleAndVolt(20,8000);
+  fourBar.setGoalAngleAndVolt(20,12000);
   fourBar.moveToAngle();
   turnForDegrees(-90);
   moveForwardCoast(-11,8000);
   goalLiftPneum.set_value(true);
-  pros::delay(2000);
-  moveForward(15);
-  intakeMotor.moveVelocity(190);
+  pros::delay(500);
+  moveForward(10);
+  intakeMotor.moveVelocity(400);
   pros::delay(3000);
   goalLiftPneum.set_value(false);
-  intakeMotor.moveVelocity(0);
+  /*turnForDegrees(-93);
+  fourBar.setGoalAngleAndVolt(65,12000);
+  fourBar.moveToAngle();
+  pros::delay(1000);
+  master.rumble("...");
+  pros::delay(1000);
+  moveForwardCoast(22,6000);
+  moveForwardCoast(-7,8000);
+  goalLiftPneum.set_value(false);*/
+  //turnForDegrees(180);
+  
+  
   
 }
 
@@ -43,46 +54,45 @@ void wpAndGoalLeft(){
 }
 
 void fullWP(){
+  //moveForwardCoast(2,12000);
   hookPneum.set_value(true);
   pros::delay(1000);
   hookPneum.set_value(false);
   moveForwardCoast(-6,8000);
   turnForDegrees(-90);
   moveForward(24);
-  turnForDegrees(88);
+  turnForDegrees(94);
   moveForward(80);
   turnForDegrees(180);
-  moveForwardCoast(-10,8000);
+  moveForwardCoast(-13,8000);
   goalLiftPneum.set_value(true);
   pros::delay(1000);
-  intakeMotor.moveVelocity(190);
+  intakeMotor.moveVelocity(400);
   moveForwardCoast(15,8000);
   goalLiftPneum.set_value(false);
 }
 
 void autonSkills(){
-
-  moveForwardCoast(-5,8000);
+  
+  moveForwardCoast(-5.5,8000);
   goalLiftPneum.set_value(true);
   moveForwardCoast(10,8000);
   fourBar.setGoalAngleAndVolt(0, 12000);
-  fourBar.moveToAngle();
+  //fourBar.moveToAngle();
   turnForDegrees(90);
   moveForwardCoast(15,12000);
-  struct Position goalPos = {-0.2,1,0};
+  struct Position goalPos = {-0.22,0.96,0};
   turnToFacePosition(goalPos);
-  moveToPosition(goalPos);
+  moveToPosition(goalPos, true, 0.05);
   hookPneum.set_value(true);
   pros::delay(500);
-  fourBar.setGoalAngleAndVolt(10,12000);
-  fourBar.moveToAngle();
-  goalPos = {0.75,0.38};
-  moveToPosition(goalPos);
   fourBar.setGoalAngleAndVolt(90,12000);
-  fourBar.moveToAngle();
+  //fourBar.moveToAngle();
+  goalPos = {0.75,0.38};
+  moveToPosition(goalPos,true,0.05);
   goalPos = {1.19,0.2,0};
   moveToPosition(goalPos);
-  fourBar.setGoalAngleAndVolt(50,12000);
+  fourBar.setGoalAngleAndVolt(45,12000);
   fourBar.moveToAngle();
   hookPneum.set_value(false);
   fourBar.setGoalAngleAndVolt(55,12000);
@@ -92,49 +102,64 @@ void autonSkills(){
   fourBar.moveToAngle();
   goalLiftPneum.set_value(false);
   pros::delay(500);
-  moveForwardCoast(5,12000);
+  moveForwardCoast(9,12000);
   turnForDegrees(175);
-  moveForwardCoast(7,12000);
+  moveForwardCoast(11,12000);
   hookPneum.set_value(true);
   fourBar.setGoalAngleAndVolt(90,12000);
   fourBar.moveToAngle();
-  turnForDegrees(140);
-  goalPos = {1.14,0.42,0};
+  //turnForDegrees(140);
+  goalPos = {1.14,0.25,0};
   turnToFacePosition(goalPos);
   moveToPosition(goalPos);
-  goalPos = {2,0.42,0};
+  goalPos = {2,0.25,0};
   turnToFacePosition(goalPos);
-  moveForwardCoast(2,12000);
-  fourBar.setGoalAngleAndVolt(45,12000);
-  fourBar.moveToAngle();
-  hookPneum.set_value(false);
+  //moveForwardCoast(2,12000);
   fourBar.setGoalAngleAndVolt(50,12000);
   fourBar.moveToAngle();
+  hookPneum.set_value(false);
   moveForwardCoast(-10,8000);
-  goalPos = {1.17,1.37,0};
+  goalPos = {0.96,1.36,0};
   fourBar.setGoalAngleAndVolt(0,12000);
-  fourBar.moveToAngle();
+  //fourBar.moveToAngle();
   turnToFacePosition(goalPos);
-  moveToPosition(goalPos);
-  moveForwardCoast(2,75);
+  moveToPosition(goalPos, true, 0);
+  //moveForwardCoast(2,150);
   hookPneum.set_value(true);  
-  goalPos = {-0.8,0.24,0};
+  goalPos = {-1.0,0.95,0};
+  moveForwardCoast(-14,8000);
   turnToFacePosition(goalPos);
   moveToPosition(goalPos);
   fourBar.setGoalAngleAndVolt(90,12000);
-  fourBar.moveToAngle();
+  //fourBar.moveToAngle();
   goalPos = {-1.14,0.07,0};
   turnToFacePosition(goalPos);
-  moveToPosition(goalPos);
-  fourBar.setGoalAngleAndVolt(50,12000);
+  moveToPosition(goalPos,true,0);
+  turnForDegrees(60);
+  fourBar.setGoalAngleAndVolt(55,12000);
   fourBar.moveToAngle();
   hookPneum.set_value(false);
-  goalPos = {-0.85,-0.87,0,true};
-  turnToFacePosition(goalPos);
+  goalPos = {-0.64,-0.54,0,true};
   fourBar.setGoalAngleAndVolt(0,12000);
-  fourBar.moveToAngle();
+  //turnForDegrees(-450);
+  turnToFacePosition(goalPos);
+  moveToPosition(goalPos,true,0);
+  goalPos = {-0.15,-0.91,0};
+  turnToFacePosition(goalPos);
   moveToPosition(goalPos);
-  goalPos = {-0.17,-0.9,0};
+  hookPneum.set_value(true);
+  fourBar.setGoalAngleAndVolt(90,12000);
+  goalPos = {-1.14,-0.1,0};
+  turnToFacePosition(goalPos);
+  moveToPosition(goalPos,true,0);
+  turnForDegrees(-60);
+  moveForwardCoast(4,12000);
+  fourBar.setGoalAngleAndVolt(55,12000);
+  fourBar.moveToAngle();
+  hookPneum.set_value(false);
+  moveForwardCoast(-8,8000);
+  //moveToPosition(goalPos);
+  /*goalPos = {-0.17,-0.9,0};
   turnToFacePosition(goalPos);
   moveToPosition(goalPos);
   hookPneum.set_value(true);
@@ -153,6 +178,6 @@ void autonSkills(){
   fourBar.setGoalAngleAndVolt(50,12000);
   fourBar.moveToAngle();
   hookPneum.set_value(false);
-  moveForwardCoast(-10,12000);
+  moveForwardCoast(-10,12000);*/
 
 }

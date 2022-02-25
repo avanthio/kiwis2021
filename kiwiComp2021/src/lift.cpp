@@ -41,14 +41,14 @@ double Lift::getHeight(){
 void Lift::setGoalAngle(double gAng){
     liftMutex.take(200);
     goalAngle = gAng;
-    std::cout<<"goal angle is:"<<goalAngle<<"\n";
+    //std::cout<<"goal angle is:"<<goalAngle<<"\n";
     liftMutex.give();
 }
 
 void Lift::setGoalVolt(double gVolt){
     liftMutex.take(200);
     goalVolt = gVolt;
-    std::cout<<"goal voltage is:"<<goalVolt<<"\n";
+    //std::cout<<"goal voltage is:"<<goalVolt<<"\n";
     liftMutex.give();
 }
 
@@ -60,7 +60,7 @@ void Lift::setGoalAngleAndVolt(double goalA, double goalV){
 void Lift::setToStart(){
     liftMutex.take(200);
     startLift = true;
-    std::cout<<"starting lift..."<<startLift<<"\n";
+    //std::cout<<"starting lift..."<<startLift<<"\n";
     liftMutex.give();
 }
 
@@ -128,17 +128,26 @@ double Lift::calcAngle(double height){
         x = height - towerHeight;
         theta = asin(x/armLength)+M_PI_2;
     }
-    std::cout<<"theta radians:"<<theta<<"\n";
+    //std::cout<<"theta radians:"<<theta<<"\n";
     theta = radiansToDegrees(theta);
-    std::cout<<"theta degrees:"<<theta<<"\n";
+    //std::cout<<"theta degrees:"<<theta<<"\n";
     liftMutex.give();
     return theta;
 }
 
 void Lift::moveToAngle(){
+    if(gpsErrOut){
+      liftMotor.moveVelocity(0);
+      return;
+    }
+
     double goalAng;
     double goalVoltage;
     double currentAngle = getAngle();
+    double errAverage = 0;
+    double lastErrAvg = 0;
+    double err = 0;
+    int loopC = 0;
 
     liftMutex.take(200);
     goalAng = goalAngle;
@@ -146,9 +155,9 @@ void Lift::moveToAngle(){
     liftMutex.give();
 
     double currentHeight = calcHeight(currentAngle);
-    std::cout<<"goal angle is:"<<goalAng<<"\n";
-    std::cout<<"current angle is:"<<currentAngle<<"\n";
-    std::cout<<"currentHeight is:"<<currentHeight<<"\n";
+    //std::cout<<"goal angle is:"<<goalAng<<"\n";
+    //std::cout<<"current angle is:"<<currentAngle<<"\n";
+    //std::cout<<"currentHeight is:"<<currentHeight<<"\n";
 
     while(1){
 
@@ -159,9 +168,9 @@ void Lift::moveToAngle(){
             liftMotor.moveVoltage(-goalVoltage);
         }
    
-        if(abs(currentAngle-goalAng)<2.5){
-            std::cout<<"in range\n";
-            std::cout<<"final angle is:"<<currentAngle<<'\n';
+        if(abs(currentAngle-goalAng)<2.5&&goalAng!=0){
+            //std::cout<<"in range\n";
+            //std::cout<<"final angle is:"<<currentAngle<<'\n';
             break;
         }
         
@@ -170,8 +179,24 @@ void Lift::moveToAngle(){
         }
       
 
-        currentAngle = getAngle();
+        if(loopC%25 == 0 && loopC>25){
+          errAverage = err/25;
+          err = 0;
+          //std::cout<<"errAverage is:"<<errAverage<<" and lastErrAvg is:"<<lastErrAvg<<"\n";
+          if(abs(errAverage-lastErrAvg)<0.75){
+            //std::cout<<"stuck and leaving loop\n";
+            break;
+          }
+          else{
+            lastErrAvg = errAverage;
+          }
+          //std::cout<<"not stuck\n";
+        }
+
+        err = err + abs(currentAngle - goalAng);
+        loopC+=1;
         pros::delay(20);
+        currentAngle = getAngle();
     }
 
     liftMotor.moveVelocity(0);

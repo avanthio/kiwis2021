@@ -11,7 +11,7 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-int chosenAuton = 4; //1 = wp and goal right, 2 = wp and goal left 
+int chosenAuton = 3; //1 = wp and goal right, 2 = wp and goal left 
 //3 = skills 4 = full wp
 void initialize() {
   //set the brake type of all the motors
@@ -99,6 +99,7 @@ void autonomous() {
  */
 
 void opcontrol() {
+
   //used to store values of controller joysticks
   int axis2 = 0;
   int axis3 = 0;
@@ -151,7 +152,7 @@ void opcontrol() {
       }
       else{
         if(intakeBool){
-          intakeMotor.moveVelocity(190);
+          intakeMotor.moveVelocity(400);
         }
         else{
           intakeMotor.moveVelocity(0);

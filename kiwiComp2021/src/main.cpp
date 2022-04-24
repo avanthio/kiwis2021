@@ -11,8 +11,10 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-int chosenAuton = 3; //1 = wp and goal right, 2 = wp and goal left 
-//3 = skills 4 = full wp
+
+int chosenAuton = 1; //1 = wp and goal right, 2 = wp and goal left 
+//3 = skills 4 = full wp //5 nogpsskills
+
 void initialize() {
   //set the brake type of all the motors
   setBrakeTypes();
@@ -81,6 +83,9 @@ void autonomous() {
   else if (chosenAuton == 4){
     fullWP();
   }
+  else if (chosenAuton ==5){
+    noGpsSkills();
+  }
 
 }
 
@@ -99,7 +104,8 @@ void autonomous() {
  */
 
 void opcontrol() {
-
+  int cnt = 0;
+  std::cout<<"LFMtrTemp:,LFMtrAmp:,RFMtrTemp:,RFMtrAmp:,LMMtrTemp:,LMMtrAmp:,RMMtrTemp:,RMMtrAmp:,LBMtrTemp:,LBMtrAmp:,RBMtrTemp:,RBMtrAmp:\n";
   //used to store values of controller joysticks
   int axis2 = 0;
   int axis3 = 0;
@@ -108,6 +114,18 @@ void opcontrol() {
   int leftBackSpeed;
   int rightFrontSpeed;
   int rightBackSpeed;
+  int lFMtrTemp;
+  int rFMtrTemp;
+  int lMMtrTemp;
+  int rMMtrTemp;
+  int lBMtrTemp;
+  int rBMtrTemp;
+  int lFMtrAmp;
+  int lBMtrAmp;
+  int lMMtrAmp;
+  int rFMtrAmp;
+  int rBMtrAmp;
+  int rMMtrAmp;
   bool goalLiftBool = 0;
   bool driveDirectBool = 0;
   bool hookBool = 0;
@@ -136,23 +154,47 @@ void opcontrol() {
     rightFrontMotor.moveVelocity(rightFrontSpeed);
     rightBackMotor.moveVelocity(rightBackSpeed);
     
-    //no, we don't have an intake, but yes, this is still here :)
+    //if the intake in button is pressed, turn the intake on
     if(intakeInBtn.changedToPressed()){
       intakeBool = !intakeBool;
     }
     
+    if(cnt%250==0&&cnt>1){
+      lFMtrTemp = leftFrontMotor.getTemperature();
+      lBMtrTemp = leftBackMotor.getTemperature();
+      rFMtrTemp = rightFrontMotor.getTemperature();
+      rBMtrTemp = rightBackMotor.getTemperature();
+      rMMtrTemp = rightMiddleMotor.getTemperature();
+      lMMtrTemp = leftMiddleMotor.getTemperature();
+      lFMtrAmp = leftFrontMotor.getCurrentDraw();
+      lBMtrAmp = leftBackMotor.getCurrentDraw();
+      lMMtrAmp = leftMiddleMotor.getCurrentDraw();
+      rFMtrAmp = rightFrontMotor.getCurrentDraw();
+      rBMtrAmp = rightBackMotor.getCurrentDraw();
+      rMMtrAmp = rightMiddleMotor.getCurrentDraw();
+
+      std::cout<<lFMtrTemp<<","<<lFMtrAmp<<","<<rFMtrTemp<<","<<rFMtrAmp<<","<<
+      lMMtrTemp<<","<<lMMtrAmp<<","<<rMMtrTemp<<","<<rMMtrAmp<<","<<
+      lBMtrTemp<<","<<lBMtrAmp<<","<<rBMtrTemp<<","<<rBMtrAmp<<"\n";
+    }
+
+    //if the four bar is lower than a certain height, fully stop the lift
     if(fourBar.getAngle()<13){
       intakeMotor.moveVelocity(0);
       intakeBool = false;
     }
     else{
+      //if the four bar isn't lower than a certain height,
+      //run the intake backwards if the backward button is pressed
       if(intakeReverseBtn.isPressed()){
-        intakeMotor.moveVelocity(-300);
+        intakeMotor.moveVelocity(-400);
         intakeBool = false;
       }
       else{
+      //else, run the intake forward if it's set to move
+      //or don't move it at all
         if(intakeBool){
-          intakeMotor.moveVelocity(400);
+          intakeMotor.moveVelocity(600);
         }
         else{
           intakeMotor.moveVelocity(0);
@@ -160,6 +202,8 @@ void opcontrol() {
       }
     }
 
+    //if the button is pressed to activate/deactivate the hook, reverse the value of the boolean
+    //and then set the hook pneumatic to the boolean value
     if(hookPneumBtn.changedToPressed()){
       hookBool = !hookBool;
       hookPneum.set_value(hookBool);
@@ -167,11 +211,14 @@ void opcontrol() {
     
     
 
-
+    //if the lift is told to go up, move it up
     if(liftUpBtn.isPressed()){
       liftMotor.moveVelocity(100);
     }
     else if(liftDownBtn.isPressed()){
+      //if the lift is told to go down, move it down
+      //but if the limit switch is activated, don't keep moving it
+      //and remind the driver it can't move anymore
       if(limitSwitch.get_value()==false){
         liftMotor.moveVelocity(-75);
       }
@@ -192,13 +239,23 @@ void opcontrol() {
     //(each time it is pressed)
     if(goalLiftPneumBtn.changedToPressed()){
       goalLiftBool = !goalLiftBool;
-      goalLiftPneum.set_value(goalLiftBool);
+      if(goalLiftBool){
+        goalHookPneum.set_value(goalLiftBool);
+        pros::delay(100);
+        goalLiftPneum.set_value(goalLiftBool);
+      }
+      else{
+        goalLiftPneum.set_value(goalLiftBool);
+        pros::delay(250);
+        goalHookPneum.set_value(goalLiftBool);
+      }
     }
 
   
 
     //the standard delay in a while loop :)
     pros::delay(20);
+    cnt+=1;
   }
 
 }

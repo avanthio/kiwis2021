@@ -18,23 +18,25 @@ okapi::ControllerButton intakeReverseBtn(okapi::ControllerDigital::B);
 okapi::ControllerButton driveReverseBtn(okapi::ControllerDigital::A); //was L2
 
 
-okapi::Motor  rightMiddleMotor(10, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  leftMiddleMotor(8,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  leftFrontMotor(5,false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  leftBackMotor(16,false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  rightFrontMotor(6,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  rightBackMotor(18,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  intakeMotor(2, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  rightMiddleMotor(5, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  leftMiddleMotor(1,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  leftFrontMotor(18,false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  leftBackMotor(13,false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  rightFrontMotor(20,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  rightBackMotor(16,true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  intakeMotor(11, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::degrees);
 //okapi::Motor  hookMotor(2, true, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
-okapi::Motor  liftMotor(11,true,okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
+okapi::Motor  liftMotor(15,false,okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::degrees);
 //okapi::Motor  stickMotor(20, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
 //okapi::Motor liftLeftMotor(20, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::degrees);
 
 //okapi::MotorGroup liftMotor({ liftRightMotor,liftLeftMotor});
-pros::Imu inertialSens(14);
+pros::Imu inertialSens(3);
 pros::ADIDigitalOut goalLiftPneum('A');
 pros::ADIDigitalOut hookPneum('C');  
+pros::ADIDigitalOut goalHookPneum('D');
 pros::ADIDigitalIn limitSwitch('B');
 
-pros::Gps gpsSens(13);
+pros::Gps gpsSens(2);
+pros::Optical opticalSens(6);
 //port, x pos, y pos, heading, x relative to center of rotation, y relative to center of rotation (all in meters, degrees)

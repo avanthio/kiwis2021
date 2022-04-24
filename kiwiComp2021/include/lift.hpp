@@ -12,8 +12,6 @@ namespace kiwiLift{
         void setGoalAngle(double);//set the goal height of the lift
         void setGoalVolt(double);//set the goal voltage of the lift
         void setGoalAngleAndVolt(double Gheight, double Gvoltage);//set both the goal height and the goal voltage of the lift
-        void setToStart();//tell the lift thread to start the lift?
-        void move();//the function called in the lift thread to move the lift/check if the lift should be moved
         void moveToAngle();//move the lift to its goal height at its goal voltage
         double getAngle();//get the current angle of the lift
         

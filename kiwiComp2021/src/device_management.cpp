@@ -29,10 +29,12 @@ void resetDevices(){
   //stickMotor.tarePosition();
   goalLiftPneum.set_value(false);
   hookPneum.set_value(false);
+  goalHookPneum.set_value(false);
   fourBar.reset();
   while(inertialSens.is_calibrating()){
     pros::delay(20);
   }
+  pros::delay(20);
 }
 
 //convert an angle measure in degrees to radians

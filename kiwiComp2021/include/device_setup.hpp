@@ -35,7 +35,9 @@ extern pros::Imu inertialSens;
 //declare the pneumatics
 extern pros::ADIDigitalOut goalLiftPneum;
 extern pros::ADIDigitalOut hookPneum;
+extern pros::ADIDigitalOut goalHookPneum;
 //declare the limit switch
 extern pros::ADIDigitalIn limitSwitch;
 
 extern pros::Gps gpsSens;
+extern pros::Optical opticalSens;

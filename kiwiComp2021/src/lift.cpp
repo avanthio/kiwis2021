@@ -2,7 +2,7 @@
 #include "pros/misc.hpp"
 using namespace kiwiLift;
 
-pros::Rotation liftEnc(19);
+pros::Rotation liftEnc(10);
 Lift fourBar(16.5,13);
 
 Lift::Lift(double towerH, double armL){//instantiate a 4 bar lift with a given height and arm length
@@ -57,38 +57,6 @@ void Lift::setGoalAngleAndVolt(double goalA, double goalV){
     setGoalVolt(goalV);
 }
 
-void Lift::setToStart(){
-    liftMutex.take(200);
-    startLift = true;
-    //std::cout<<"starting lift..."<<startLift<<"\n";
-    liftMutex.give();
-}
-
-void Lift::move(){
-   bool shouldMove = false;
-   while(pros::competition::is_autonomous()){
-   liftMutex.take(200);
-   if(startLift == true){
-       shouldMove = true;
-   }
-   else{
-       shouldMove = false;
-   }
-   liftMutex.give();
-   if(shouldMove){
-       moveToAngle();
-       shouldMove = false;
-       liftMutex.take(200);
-       startLift = false;
-       liftMutex.give();
-   }
-   else{
-   }
-
-   pros::delay(20);
-   }
-}
-
 double Lift::getAngle(){
     double currAngl;
     liftMutex.take(200);
@@ -136,10 +104,7 @@ double Lift::calcAngle(double height){
 }
 
 void Lift::moveToAngle(){
-    if(gpsErrOut){
-      liftMotor.moveVelocity(0);
-      return;
-    }
+
 
     double goalAng;
     double goalVoltage;
@@ -178,7 +143,7 @@ void Lift::moveToAngle(){
           break;
         }
       
-
+        //check if the lift is stuck in one place and break the loop if it is
         if(loopC%25 == 0 && loopC>25){
           errAverage = err/25;
           err = 0;

@@ -9,10 +9,30 @@
 //from the bonus line
 
 void wpAndGoalRight(){
+  hookPneum.set_value(true);
+  //pros::delay(1000);*/
+  moveForwardTest(44,true,1);
+  /*hookPneum.set_value(true);
   fourBar.setGoalAngleAndVolt(0, 8000);
-  moveForwardTest(39, true, 5);
-  moveForward(-25);
-  fourBar.setGoalAngleAndVolt(20,12000);
+  moveForwardTest(44, true, 1);
+  bool goalMissed;
+  pros::delay(20);
+  int goalProx = opticalSens.get_proximity();
+  if(goalProx<255){
+    goalMissed = true;
+    std::cout<<"missed\n";
+  }
+  
+  if(goalMissed){
+    turnForDegrees(-90);
+    hookPneum.set_value(true);
+    //moveForward(30,true);
+  }
+  else{
+    moveForward(-30);
+  }*/
+  //moveForward(-30);
+  /*fourBar.setGoalAngleAndVolt(20,12000);
   fourBar.moveToAngle();
   turnForDegrees(-90);
   moveForwardCoast(-11,8000);
@@ -21,7 +41,7 @@ void wpAndGoalRight(){
   moveForward(10);
   intakeMotor.moveVelocity(400);
   pros::delay(3000);
-  goalLiftPneum.set_value(false);
+  goalLiftPneum.set_value(false);*/
   /*turnForDegrees(-93);
   fourBar.setGoalAngleAndVolt(65,12000);
   fourBar.moveToAngle();
@@ -53,6 +73,9 @@ void wpAndGoalLeft(){
   intakeMotor.moveVelocity(0);
 }
 
+//get the win point alone 
+//only for use if partner does not have good auton
+//and the opposing alliance is really good/really not that good
 void fullWP(){
   //moveForwardCoast(2,12000);
   hookPneum.set_value(true);
@@ -72,6 +95,8 @@ void fullWP(){
   goalLiftPneum.set_value(false);
 }
 
+
+//120 (usually) or 160 (if really lucky) point auton skills
 void autonSkills(){
   
   moveForwardCoast(-5.5,8000);
@@ -158,26 +183,49 @@ void autonSkills(){
   fourBar.moveToAngle();
   hookPneum.set_value(false);
   moveForwardCoast(-8,8000);
-  //moveToPosition(goalPos);
-  /*goalPos = {-0.17,-0.9,0};
-  turnToFacePosition(goalPos);
-  moveToPosition(goalPos);
-  hookPneum.set_value(true);
-  fourBar.setGoalAngleAndVolt(5,12000);
+
+}
+
+void noGpsSkills(){
+  fourBar.setGoalAngleAndVolt(0, 8000);
+  moveForwardTest(39, true, 5);
+  moveForward(-25);
+  fourBar.setGoalAngleAndVolt(20,12000);
   fourBar.moveToAngle();
-  goalPos = {-0.84,-0.24,0};
-  turnToFacePosition(goalPos);
-  moveToPosition(goalPos);
+  turnForDegrees(-90);
+  moveForwardCoast(-11,8000);
+  goalLiftPneum.set_value(true);
+  pros::delay(500);
+  moveForward(10);
+  turnForDegrees(90);
+  moveForward(64);
+  turnForDegrees(-90);
+  moveForward(38);
   fourBar.setGoalAngleAndVolt(90,12000);
   fourBar.moveToAngle();
-  goalPos = {-0.96,0,0};
-  turnToFacePosition(goalPos);
-  moveToPosition(goalPos);
-  turnForDegrees(-60);
-  moveForward(4,12000);
+  turnForDegrees(90);
+  moveForwardCoast(6,12000);
   fourBar.setGoalAngleAndVolt(50,12000);
   fourBar.moveToAngle();
   hookPneum.set_value(false);
-  moveForwardCoast(-10,12000);*/
+  goalLiftPneum.set_value(false);
+  pros::delay(1500);
+  moveForwardCoast(-14,12000);
+  fourBar.setGoalAngleAndVolt(0,12000);
+  fourBar.moveToAngle();
+  moveForwardCoast(8,12000);
+  turnForDegrees(180);
+  moveForward(8,true);
+  hookPneum.set_value(true);
+  fourBar.setGoalAngleAndVolt(65,12000);
+  fourBar.moveToAngle();
+  turnForDegrees(180);
+  moveForward(15);
+  hookPneum.set_value(false);
+  moveForwardCoast(-70,6000);
+  turnForDegrees(-45);
+  moveForwardCoast(64,12000);
+
+
 
 }

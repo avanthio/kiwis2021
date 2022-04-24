@@ -7,3 +7,4 @@ extern void wpAndGoalLeft();
 extern void wpAndGoalRight();
 extern void fullWP();
 extern void autonSkills();
+extern void noGpsSkills();

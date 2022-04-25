@@ -10,8 +10,29 @@
 
 void wpAndGoalRight(){
   hookPneum.set_value(true);
+  //fourBar.setGoalAngleAndVolt(0, 8000);
   //pros::delay(1000);*/
-  moveForwardTest(44,true,1);
+  pros::lcd::print(1,">:(");
+  moveForwardTest(44,true,1000);
+  pros::delay(350);
+  moveForward(-35);
+  turnForDegrees(-90);
+  moveForward(-12);
+  goalHookPneum.set_value(true);
+  pros::delay(100);
+  goalLiftPneum.set_value(true);
+  pros::delay(500);
+  fourBar.setGoalAngleAndVolt(20,8000);
+  fourBar.moveToAngle();
+  intakeMotor.moveVelocity(600);
+  moveForwardCoast(2,8000);
+  turnForDegrees(90);
+  moveForwardCoast(30,8000);
+  moveForward(-40);
+  goalLiftPneum.set_value(false);
+  pros::delay(250);
+  goalHookPneum.set_value(false);
+  //moveForward(20);
   /*hookPneum.set_value(true);
   fourBar.setGoalAngleAndVolt(0, 8000);
   moveForwardTest(44, true, 1);
@@ -61,16 +82,22 @@ void wpAndGoalRight(){
 //it grabs a goal from the neutral zone and also
 //scores a ring in our alliance goal on the "left" side of the field
 void wpAndGoalLeft(){
-  fourBar.setGoalAngleAndVolt(0, 8000);
-  moveForwardTest(39, true, 5);
-  moveForward(-33);
-  fourBar.setGoalAngleAndVolt(20,8000);
-  fourBar.moveToAngle();
-  turnForDegrees(-55);
-  moveForwardCoast(-5.5,8000);
-  intakeMotor.moveVelocity(190);
-  pros::delay(3000);
-  intakeMotor.moveVelocity(0);
+  hookPneum.set_value(true);
+  //fourBar.setGoalAngleAndVolt(0, 8000);
+  //pros::delay(1000);*/
+  pros::lcd::print(1,">:(");
+  moveForwardTest(46,true,1000);
+  pros::delay(350);
+  moveForward(-47);
+  turnForDegrees(-90);
+  moveForward(-10);
+  goalHookPneum.set_value(true);
+  pros::delay(100);
+  goalLiftPneum.set_value(true);
+  pros::delay(500);
+  moveForward(12);
+  turnForDegrees(120);
+
 }
 
 //get the win point alone 

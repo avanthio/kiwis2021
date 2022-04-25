@@ -251,10 +251,12 @@ void moveForward(double targetDistance, bool hookBool){
     rightVelo = velo;
   
 
-    veloAdjust = angleCorrectionPID.getOutput(headingErr)*0.5*velo;
-    
+    veloAdjust = angleCorrectionPID.getOutput(headingErr)*velo;
+    if(abs(veloAdjust)>abs(0.5*velo)){
+      veloAdjust = 0.5*velo*getSign(veloAdjust);
+    }
 
-    if (headingErr < 0) {
+    if (headingErr > 0) {
       leftVelo -= veloAdjust;
       rightVelo += veloAdjust;
     } 
@@ -375,15 +377,10 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
     if(hookBool == true){
       goalProximity = opticalSens.get_proximity();
       if(goalProximity>=goalInRange&&notSetAlready){
-          if(inRangeCount<2){
-            inRangeCount+=1;
-          }
-          else{
           hookPneum.set_value(false);
           notSetAlready = false;
           //std::cout<<"hook dropped at:"<<goalProximity<<"after this many loops:" <<loopCount<<'\n';
           break;
-          }
       }
     }
 
@@ -396,8 +393,11 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
     rightVelo = velo;
   
     veloAdjust = angleCorrectionPID.getOutput(headingErr)*0.5*velo;
+    if(abs(veloAdjust)>abs(0.5*velo)){
+      veloAdjust = 0.5*velo*getSign(veloAdjust);
+    }
       
-    if (headingErr < 0) {
+    if (headingErr > 0) {
       leftVelo -= veloAdjust;
       rightVelo += veloAdjust;
     } 
@@ -513,6 +513,10 @@ void moveForwardCoast(double targetDistance, int veloc){
     rightVelo = velo;
 
     veloAdjust = angleCorrectionPID.getOutput(headingErr)*abs(velo);
+    if(abs(veloAdjust)>abs(0.5*velo)){
+      veloAdjust = 0.5*velo*getSign(veloAdjust);
+    }
+
     //iOutput = angleCorrectionPID.getiOutput()*abs(velo);  
     if (headingErr < 0) {
       leftVelo -= veloAdjust;

@@ -27,6 +27,9 @@ void initialize() {
   setUpPIDs();
   //confirm that initialization is done
   pros::lcd::print(1,"done");
+  double avgTemp = (leftFrontMotor.getTemperature()+rightFrontMotor.getTemperature()+leftBackMotor.getTemperature()+rightBackMotor.getTemperature())/4.0;
+  std::string avgMotorTemp = std::to_string(avgTemp);
+  master.setText(1,1,avgMotorTemp);
 
 
 }
@@ -194,7 +197,7 @@ void opcontrol() {
       //else, run the intake forward if it's set to move
       //or don't move it at all
         if(intakeBool){
-          intakeMotor.moveVelocity(600);
+          intakeMotor.moveVelocity(500);
         }
         else{
           intakeMotor.moveVelocity(0);

@@ -10,8 +10,6 @@
 
 void wpAndGoalRight(){
   hookPneum.set_value(true);
-  //fourBar.setGoalAngleAndVolt(0, 8000);
-  //pros::delay(1000);*/
   pros::lcd::print(1,">:(");
   moveForwardTest(44,true,1000);
   pros::delay(350);
@@ -32,48 +30,6 @@ void wpAndGoalRight(){
   goalLiftPneum.set_value(false);
   pros::delay(250);
   goalHookPneum.set_value(false);
-  //moveForward(20);
-  /*hookPneum.set_value(true);
-  fourBar.setGoalAngleAndVolt(0, 8000);
-  moveForwardTest(44, true, 1);
-  bool goalMissed;
-  pros::delay(20);
-  int goalProx = opticalSens.get_proximity();
-  if(goalProx<255){
-    goalMissed = true;
-    std::cout<<"missed\n";
-  }
-  
-  if(goalMissed){
-    turnForDegrees(-90);
-    hookPneum.set_value(true);
-    //moveForward(30,true);
-  }
-  else{
-    moveForward(-30);
-  }*/
-  //moveForward(-30);
-  /*fourBar.setGoalAngleAndVolt(20,12000);
-  fourBar.moveToAngle();
-  turnForDegrees(-90);
-  moveForwardCoast(-11,8000);
-  goalLiftPneum.set_value(true);
-  pros::delay(500);
-  moveForward(10);
-  intakeMotor.moveVelocity(400);
-  pros::delay(3000);
-  goalLiftPneum.set_value(false);*/
-  /*turnForDegrees(-93);
-  fourBar.setGoalAngleAndVolt(65,12000);
-  fourBar.moveToAngle();
-  pros::delay(1000);
-  master.rumble("...");
-  pros::delay(1000);
-  moveForwardCoast(22,6000);
-  moveForwardCoast(-7,8000);
-  goalLiftPneum.set_value(false);*/
-  //turnForDegrees(180);
-  
   
   
 }

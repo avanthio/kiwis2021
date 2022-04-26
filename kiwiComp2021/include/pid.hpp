@@ -20,6 +20,7 @@ public:
   double getiOutput();
   double getpOutput();
   double getdOutput();
+  double getSetpoint();
 
 
 private:

@@ -8,28 +8,28 @@ KiwiPID::KiwiPID(double kp,double ki, double kd){
 }
 
 void KiwiPID::init(){
-	p=0;
-	i=0;
-	d=0;
+  p=0;
+  i=0;
+  d=0;
 
-	iMax = 0;
+  iMax = 0;
   iMin = 0;
   deadzone = 0;
-	errorSum = 0;
+  errorSum = 0;
   maxErrForI = 0;
   lastError = 0;
-	maxOutput = 0;
-	minOutput = 0;
+  maxOutput = 0;
+  minOutput = 0;
   rawOutput = 0;
-	setpoint = 0;
-	lastActual = 0;
-	firstRun = true;
+  setpoint = 0;
+  lastActual = 0;
+  firstRun = true;
 }
 
 //resets some stored values for the PID
 void KiwiPID::reset(){
-	firstRun = true;
-	errorSum = 0;
+  firstRun = true;
+  errorSum = 0;
   lastError = 0;
   rawOutput = 0;
   iOutp = 0;
@@ -80,6 +80,10 @@ double KiwiPID::getpOutput(){
 
 double KiwiPID::getdOutput(){
   return dOutp;
+}
+
+double KiwiPID::getSetpoint(){
+  return setpoint;
 }
 
 double KiwiPID::getOutput(double actual){

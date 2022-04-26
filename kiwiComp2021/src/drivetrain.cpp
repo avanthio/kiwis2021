@@ -10,7 +10,7 @@ KiwiPID turnPID(300,30,1000);//i was 20
 KiwiPID turnPID2(500,40,1400);
 KiwiPID straightPID(400,90,200);//40 integral was really good
 KiwiPID angleAdjustPID((8.0/360.0),0,0);//going to coordinates
-KiwiPID angleCorrectionPID(0.05,0,0);//going for a relative distance//was1/100(p)
+KiwiPID angleCorrectionPID(0.1,0,0);//going for a relative distance//was1/100(p)
 KiwiPID stForwardPID(1500,150,2400);
 
 //This function manages the PIDs at the start of the program.
@@ -176,26 +176,32 @@ double distanceToPoint(Position current, Position goal){
 void moveForward(double targetDistance, bool hookBool){
   stForwardPID.reset();
   angleCorrectionPID.reset();
-  pros::delay(20);
   //std::cout<<"loop count, heading error, heading correction, i output\n";
-
+  pros::delay(20);
   int x = 0;
+
   int highestVelo = 0;
   int currVelo;
   int velo;
   int step = 3000;
+
   double goal = calcDriveDegrees(targetDistance);
   double distanceErr;
   double currEnc = 0;
+
   int leftVelo = velo;
+  int rightVelo = velo;
+
   double iOutput;
   int loopCount = 0;
-  int rightVelo = velo;
-  int veloAdjust = 60;
-  double adjustVelocityPCT;
+
+  int veloAdjust = 0;
   double initialInert = inertialSens.get_rotation();
   double currInert = initialInert;
   double headingErr = currInert - initialInert;
+  angleCorrectionPID.setSetpoint(initialInert);
+  std::cout<<"setpoint"<<angleCorrectionPID.getSetpoint()<<"\n";
+
   int sign;
   bool notSetAlready = true;
   bool notMaxed = true;
@@ -204,8 +210,6 @@ void moveForward(double targetDistance, bool hookBool){
     step = -step;
   }
 
-  pros::delay(20);
-
   leftFrontMotor.tarePosition();
   rightFrontMotor.tarePosition();
   leftBackMotor.tarePosition();
@@ -213,15 +217,9 @@ void moveForward(double targetDistance, bool hookBool){
 
   pros::delay(loopDelay);
 
-
   while (1) {
     currEnc = (rightBackMotor.getPosition() + leftBackMotor.getPosition())/2.0;
-
-    
-    
-    
     distanceErr = calcDriveDistance(goal - currEnc);
-
 
     if(abs(velo)<12000&&notMaxed){
       velo+=step;
@@ -231,51 +229,38 @@ void moveForward(double targetDistance, bool hookBool){
       velo = stForwardPID.getOutput(-distanceErr);
     }
 
-  
+    leftVelo = velo;
+    rightVelo = velo;
+
     if(hookBool == true){
-        sign = getSign(velo);
-        if(sign == -1 && notSetAlready == true){
-          hookPneum.set_value(true);
-          notSetAlready = false;
-          //std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
-          break;
-        }
+      sign = getSign(velo);
+      if(sign == -1 && notSetAlready == true){
+        hookPneum.set_value(true);
+        notSetAlready = false;
+        //std::cout<<"hook dropped at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n';
+        break;
+      }
     }
 
     currInert = inertialSens.get_rotation();
-    //std::cout<<currInert;
+
     headingErr = currInert - initialInert;
-   
 
-    leftVelo = velo;
-    rightVelo = velo;
-  
-
-    veloAdjust = angleCorrectionPID.getOutput(headingErr)*velo;
+    veloAdjust = angleCorrectionPID.getOutput(currInert)*abs(velo);
     if(abs(veloAdjust)>abs(0.5*velo)){
-      veloAdjust = 0.5*velo*getSign(veloAdjust);
+      veloAdjust = 0.5*abs(velo)*getSign(veloAdjust);
     }
 
-    if (headingErr > 0) {
-      leftVelo -= veloAdjust;
-      rightVelo += veloAdjust;
-    } 
-    else {
-      leftVelo +=veloAdjust;
-      rightVelo -= veloAdjust;
-    }
+    leftVelo+=veloAdjust;
+    rightVelo-=veloAdjust;  
+
+    leftFrontMotor.moveVoltage(leftVelo);
+    leftMiddleMotor.moveVoltage(leftVelo);
+    leftBackMotor.moveVoltage(leftVelo);
+    rightFrontMotor.moveVoltage(rightVelo);
+    rightMiddleMotor.moveVoltage(rightVelo);
+    rightBackMotor.moveVoltage(rightVelo);
     
-
-      
-
-      leftFrontMotor.moveVoltage(leftVelo);
-      leftMiddleMotor.moveVoltage(leftVelo);
-      leftBackMotor.moveVoltage(leftVelo);
-      rightFrontMotor.moveVoltage(rightVelo);
-      rightMiddleMotor.moveVoltage(rightVelo);
-      rightBackMotor.moveVoltage(rightVelo);
-    
-
     if(abs(goal-currEnc)<10){
       x+=1;
     }
@@ -291,6 +276,7 @@ void moveForward(double targetDistance, bool hookBool){
     loopCount +=1;
   }
 
+  std::cout<<"final heading:"<<currInert<<"\n";
   //std::cout<<"finished at:"<<currEnc<<" which is this many loops:" <<loopCount<<'\n'<<"or this many inches:"<< calcDriveDistance(currEnc)<<'\n';
   leftFrontMotor.moveVelocity(0);
   leftMiddleMotor.moveVelocity(0);
@@ -298,7 +284,6 @@ void moveForward(double targetDistance, bool hookBool){
   rightFrontMotor.moveVelocity(0);
   leftBackMotor.moveVelocity(0);
   rightBackMotor.moveVelocity(0);
-
 }
 
 void liftMove(){//just call this function to start the lift
@@ -315,22 +300,28 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
   int x = 0;
   int velo;
   int step = 3000;
+
   double goal = calcDriveDegrees(targetDistance);
   double moveArmHere = calcDriveDegrees(distanceForArmMotion);
   double distanceErr;
   double currEnc = 0;
-  int leftVelo = velo;
+  
   int loopCount = 0;
+
+  int leftVelo = velo;
   int rightVelo = velo;
-  int veloAdjust = 60;
-  double adjustVelocityPCT;
+
+  int veloAdjust = 0;
   double initialInert = inertialSens.get_rotation();
   double currInert = initialInert;
   double headingErr = currInert - initialInert;
+  angleCorrectionPID.setSetpoint(initialInert);
+
   int sign;
   int goalProximity;
   int goalInRange = 255;
   int inRangeCount = 0;
+
   bool notSetAlready = true;
   bool armNotToldToMove = true;
   bool notMaxed = true;
@@ -338,8 +329,6 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
   if(targetDistance<0){
     step = -step;
   }
-
-  pros::delay(20);
 
   leftFrontMotor.tarePosition();
   rightFrontMotor.tarePosition();
@@ -349,9 +338,8 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
   pros::delay(loopDelay);
 
   while (1) {
-    
-
     currEnc = (rightBackMotor.getPosition() + leftBackMotor.getPosition())/2.0;
+    distanceErr = calcDriveDistance(goal - currEnc);
 
     //if the arm hasn't been told to move and the robot is within ten encoder ticks
     //of the distance where it's supposed to start moving the lift, start the task which
@@ -361,8 +349,6 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
       armNotToldToMove = false;
       //std::cout<<"told arm to move!"<<"\n";
     }
-    
-    distanceErr = calcDriveDistance(goal - currEnc);
 
     if(abs(velo)<12000&&notMaxed){
       velo+=step;
@@ -372,43 +358,29 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
       velo = stForwardPID.getOutput(-distanceErr);
     }
 
-    
+    leftVelo = velo;
+    rightVelo = velo;
 
     if(hookBool == true){
       goalProximity = opticalSens.get_proximity();
       if(goalProximity>=goalInRange&&notSetAlready){
-          hookPneum.set_value(false);
-          notSetAlready = false;
-          //std::cout<<"hook dropped at:"<<goalProximity<<"after this many loops:" <<loopCount<<'\n';
-          break;
+        hookPneum.set_value(false);
+        notSetAlready = false;
+        //std::cout<<"hook dropped at:"<<goalProximity<<"after this many loops:" <<loopCount<<'\n';
+        break;
       }
     }
 
     currInert = inertialSens.get_rotation();
-    //std::cout<<currInert;
     headingErr = currInert - initialInert;
-   
+    veloAdjust = angleCorrectionPID.getOutput(currInert)*abs(velo);
 
-    leftVelo = velo;
-    rightVelo = velo;
-  
-    veloAdjust = angleCorrectionPID.getOutput(headingErr)*0.5*velo;
     if(abs(veloAdjust)>abs(0.5*velo)){
-      veloAdjust = 0.5*velo*getSign(veloAdjust);
+      veloAdjust = 0.5*abs(velo)*getSign(veloAdjust);
     }
-      
-    if (headingErr > 0) {
-      leftVelo -= veloAdjust;
-      rightVelo += veloAdjust;
-    } 
-    else {
-      leftVelo +=veloAdjust;
-      rightVelo -= veloAdjust;
-    }
-     
-      
 
-    
+    leftVelo+=veloAdjust;
+    rightVelo-=veloAdjust;
 
     leftFrontMotor.moveVoltage(leftVelo);
     leftMiddleMotor.moveVoltage(leftVelo);
@@ -416,7 +388,6 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
     rightFrontMotor.moveVoltage(rightVelo);
     rightMiddleMotor.moveVoltage(rightVelo);
     rightBackMotor.moveVoltage(rightVelo);
-    
 
     if(abs(goal-currEnc)<10){
       x+=1;
@@ -440,7 +411,6 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
   rightFrontMotor.moveVelocity(0);
   leftBackMotor.moveVelocity(0);
   rightBackMotor.moveVelocity(0);
-
 }
 
 //move forward and reach the goal
@@ -448,29 +418,33 @@ void moveForwardTest(double targetDistance, bool hookBool, double distanceForArm
 void moveForwardCoast(double targetDistance, int veloc){
   stForwardPID.reset();
   angleCorrectionPID.reset();
+  pros::delay(20);
 
   int x = 0;
+
   int highestVelo = 0;
   int currVelo;
   int velo;
+
   double goal = calcDriveDegrees(targetDistance);
   double distanceErr;
-  double currEnc = 0;
-  int leftVelo = velo;
   double lastDistanceErr = 0;
+  double currEnc = 0;
+
+  int leftVelo = velo;
+  int rightVelo = velo;
+
   double iOutput;
   int loopCount = 0;
-  int rightVelo = velo;
-  int veloAdjust = 60;
-  double adjustVelocityPCT;
+
+  int veloAdjust = 0;
   double initialInert = inertialSens.get_rotation();
   double currInert = initialInert;
   double headingErr = currInert - initialInert;
+  angleCorrectionPID.setSetpoint(initialInert);
+
   int sign;
   bool notSetAlready = true;
-
-
-  pros::delay(20);
 
   leftFrontMotor.tarePosition();
   rightFrontMotor.tarePosition();
@@ -480,64 +454,31 @@ void moveForwardCoast(double targetDistance, int veloc){
   pros::delay(loopDelay);
 
   while (1) {
-    currEnc = (leftFrontMotor.getPosition() + rightFrontMotor.getPosition() +
-               rightBackMotor.getPosition() + leftBackMotor.getPosition()) /
-              4.0;
-
-    
-    
-    if(loopCount%20 == 0||abs(currEnc-goal)<50){
-      //std::cout<<currEnc<<"\n";
-    }
+    currEnc = (leftBackMotor.getPosition()+rightBackMotor.getPosition())/2.0;
     distanceErr = calcDriveDistance(goal - currEnc);
 
-    
     velo = stForwardPID.getOutput(-distanceErr)*veloc/12000;
-    
-
-    if(loopCount%5 == 0&&loopCount<100){
-      //std::cout<<loopCount<<","<<headingErr<<","<<veloAdjust<<","<<iOutput<<"\n";
-      
-    }
-
-
-
-    currInert = inertialSens.get_rotation();
-    headingErr = currInert - initialInert;
-    //if (abs(goal - currEnc) > 15) {
-
-      // only adjust the direction of the robot if it is off
-      // by more than one degree
-
     leftVelo = velo;
     rightVelo = velo;
+    
+    currInert = inertialSens.get_rotation();
+    headingErr = currInert - initialInert;
+    veloAdjust = angleCorrectionPID.getOutput(currInert)*abs(velo);
 
-    veloAdjust = angleCorrectionPID.getOutput(headingErr)*abs(velo);
     if(abs(veloAdjust)>abs(0.5*velo)){
-      veloAdjust = 0.5*velo*getSign(veloAdjust);
+      veloAdjust = 0.5*abs(velo)*getSign(veloAdjust);
     }
 
-    //iOutput = angleCorrectionPID.getiOutput()*abs(velo);  
-    if (headingErr < 0) {
-      leftVelo -= veloAdjust;
-      rightVelo += veloAdjust;
-    } 
-    else {
-      leftVelo +=veloAdjust;
-      rightVelo -= veloAdjust;
-    }
+    leftVelo+=veloAdjust;
+    rightVelo-=veloAdjust;
     
-
-      
-
-      leftFrontMotor.moveVoltage(leftVelo);
-      leftMiddleMotor.moveVoltage(leftVelo);
-      leftBackMotor.moveVoltage(leftVelo);
-      rightFrontMotor.moveVoltage(rightVelo);
-      rightMiddleMotor.moveVoltage(rightVelo);
-      rightBackMotor.moveVoltage(rightVelo);
+    leftFrontMotor.moveVoltage(leftVelo);
+    leftMiddleMotor.moveVoltage(leftVelo);
+    leftBackMotor.moveVoltage(leftVelo);
+    rightFrontMotor.moveVoltage(rightVelo);
+    rightMiddleMotor.moveVoltage(rightVelo);
+    rightBackMotor.moveVoltage(rightVelo);
     
-
     if(abs(goal-currEnc)<10||abs(distanceErr-lastDistanceErr)<0.1){
       x+=1;
     }
@@ -568,8 +509,9 @@ void moveForwardCoast(double targetDistance, int veloc){
 // turn a certain number of degrees based on the inertial sensor's readings:
 // make the value negative to make it turn the opposite direction
 void turnForDegrees(double turnAngle) {
-  std::cout<<"loop count, rotation error, pid output\n";
+  //std::cout<<"loop count, rotation error, pid output\n";
   turnPID.reset();
+  pros::delay(20);
   double currRotation = inertialSens.get_rotation();
   double goalRotation = currRotation + turnAngle;
   int leftVeloc;
@@ -585,7 +527,7 @@ void turnForDegrees(double turnAngle) {
 
     veloc = turnPID.getOutput(rotationErr);
     if(loopCount%2 == 0&&loopCount<200){
-      std::cout<<loopCount<<","<<rotationErr<<","<<veloc<<"\n";
+      //std::cout<<loopCount<<","<<rotationErr<<","<<veloc<<"\n";
     }
     
     leftVeloc = veloc;

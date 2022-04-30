@@ -6,7 +6,7 @@
 
 const int loopDelay = 20;
   
-KiwiPID turnPID(300,30,1000);//i was 20
+KiwiPID turnPID(500,30,1000);//i was 20
 KiwiPID turnPID2(500,40,1400);
 KiwiPID straightPID(400,90,200);//40 integral was really good
 KiwiPID angleAdjustPID((8.0/360.0),0,0);//going to coordinates
@@ -541,7 +541,7 @@ void turnForDegrees(double turnAngle) {
     rightMiddleMotor.moveVoltage(rightVeloc);
     rightBackMotor.moveVoltage(rightVeloc);
 
-    if (abs(rotationErr) < 0.5) {
+    if (abs(rotationErr) < 1) {
       x += 1;
     }
     else{

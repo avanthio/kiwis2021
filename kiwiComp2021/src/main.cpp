@@ -12,7 +12,7 @@
  * to keep execution time for this mode under a few seconds.
  */
 
-int chosenAuton = 1; //1 = wp and goal right, 2 = wp and goal left 
+int chosenAuton = 3; //1 = wp and goal right, 2 = wp and goal left 
 //3 = skills 4 = full wp //5 nogpsskills
 
 void initialize() {
@@ -81,14 +81,9 @@ void autonomous() {
     wpAndGoalLeft();
   }
   else if (chosenAuton == 3){
-    autonSkills();
-  }
-  else if (chosenAuton == 4){
     fullWP();
   }
-  else if (chosenAuton ==5){
-    noGpsSkills();
-  }
+  
 
 }
 
@@ -197,7 +192,7 @@ void opcontrol() {
       //else, run the intake forward if it's set to move
       //or don't move it at all
         if(intakeBool){
-          intakeMotor.moveVelocity(500);
+          intakeMotor.moveVelocity(600);
         }
         else{
           intakeMotor.moveVelocity(0);

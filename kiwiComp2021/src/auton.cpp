@@ -13,24 +13,43 @@ void wpAndGoalRight(){
   pros::lcd::print(1,">:(");
   moveForwardTest(44,true,1000);
   pros::delay(350);
-  moveForward(-35);
-  turnForDegrees(-90);
-  moveForward(-12);
-  goalHookPneum.set_value(true);
-  pros::delay(100);
-  goalLiftPneum.set_value(true);
-  pros::delay(500);
-  fourBar.setGoalAngleAndVolt(20,8000);
-  fourBar.moveToAngle();
-  intakeMotor.moveVelocity(600);
-  moveForwardCoast(2,8000);
-  turnForDegrees(90);
-  moveForwardCoast(30,8000);
-  moveForward(-40);
+  int goalCheck = opticalSens.get_proximity();
+  if(goalCheck<200){
+    moveForward(-27);
+    turnForDegrees(-90);
+    moveForwardCoast(-15,8000);
+    goalHookPneum.set_value(true);
+    pros::delay(100);
+    goalLiftPneum.set_value(true);
+    pros::delay(500);
+    fourBar.setGoalAngleAndVolt(20,8000);
+    fourBar.moveToAngle();
+    intakeMotor.moveVelocity(500);
+    moveForwardCoast(5,8000);
+    turnForDegrees(90);
+    moveForwardCoast(30,4000);
+  }
+  else{
+    moveForward(-35);
+    turnForDegrees(-90);
+    moveForward(-12);
+    goalHookPneum.set_value(true);
+    pros::delay(100);
+    goalLiftPneum.set_value(true);
+    pros::delay(500);
+    fourBar.setGoalAngleAndVolt(20,8000);
+    fourBar.moveToAngle();
+    intakeMotor.moveVelocity(500);
+    moveForwardCoast(2,8000);
+    turnForDegrees(90);
+    moveForwardCoast(20,5000);
+  }
+
+  moveForward(-30);
+  intakeMotor.moveVelocity(0);
   goalLiftPneum.set_value(false);
   pros::delay(250);
-  goalHookPneum.set_value(false);
-  
+  goalHookPneum.set_value(false);  
   
 }
 
@@ -44,15 +63,31 @@ void wpAndGoalLeft(){
   pros::lcd::print(1,">:(");
   moveForwardTest(46,true,1000);
   pros::delay(350);
-  moveForward(-47);
-  turnForDegrees(-90);
-  moveForward(-10);
-  goalHookPneum.set_value(true);
-  pros::delay(100);
-  goalLiftPneum.set_value(true);
-  pros::delay(500);
-  moveForward(12);
-  turnForDegrees(120);
+  int goalCheck = opticalSens.get_proximity();
+  if(goalCheck>200){
+    moveForward(-40);
+  }
+  else{
+    moveForward(-35);
+  }
+    
+    turnForDegrees(-45);
+    moveForward(-11);
+    goalHookPneum.set_value(true);
+    pros::delay(100);
+    goalLiftPneum.set_value(true);
+    pros::delay(500);
+    moveForward(11);
+    fourBar.setGoalAngleAndVolt(20,8000);
+    fourBar.moveToAngle();
+    intakeMotor.moveVelocity(600);
+    turnForDegrees(80);
+    moveForwardCoast(30,6000);
+    pros::delay(500);
+    moveForward(-20);
+    goalLiftPneum.set_value(false);
+    pros::delay(500);
+    goalHookPneum.set_value(false);
 
 }
 
@@ -61,21 +96,28 @@ void wpAndGoalLeft(){
 //and the opposing alliance is really good/really not that good
 void fullWP(){
   //moveForwardCoast(2,12000);
-  hookPneum.set_value(true);
-  pros::delay(1000);
-  hookPneum.set_value(false);
-  moveForwardCoast(-6,8000);
-  turnForDegrees(-90);
-  moveForward(24);
-  turnForDegrees(94);
-  moveForward(80);
+  fourBar.setGoalAngleAndVolt(10,12000);
+  fourBar.moveToAngle();
+  moveForwardCoast(-5,12000);
+  goalHookPneum.set_value(true);
+  pros::delay(100);
+  goalHookPneum.set_value(false);
+  moveForward(15);
+  turnForDegrees(90);
+  moveForward(20);
+  turnForDegrees(87);
+  moveForward(77);
   turnForDegrees(180);
-  moveForwardCoast(-13,8000);
+  moveForward(-20);
+  goalHookPneum.set_value(true);
+  pros::delay(100);
   goalLiftPneum.set_value(true);
+  pros::delay(500);
+  intakeMotor.moveVelocity(600);
+  moveForward(15);
   pros::delay(1000);
-  intakeMotor.moveVelocity(400);
-  moveForwardCoast(15,8000);
   goalLiftPneum.set_value(false);
+
 }
 
 
